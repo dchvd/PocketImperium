@@ -5,7 +5,7 @@ public enum Color {
 	COLOR2("blue"),
 	COLOR3("yellow"),
 	COLOR4("green");
-	
+	// Commentaire
 	//Attributs
 	private String color;
 	

@@ -61,6 +61,36 @@ public class Player {
     		}
     	}
 
+	public void plan() {
+    	commands=null;
+    	/**
+    	 * RAPPEL POUR NOUS 
+    	
+    	int commandExpand=1;
+    	int commandExplore=2;
+    	int commandExterminate=3;
+    	*/
+    	int command;
+    	Scanner scanner = new Scanner(System.in);
+    	
+    	System.out.println("Planifiez l'ordre dans lequel vous souhaitez effectuer les commandes.");
+    	System.out.println("Tapez 1 pour Expand");
+    	System.out.println("Tapez 2 pour Explore");
+    	System.out.println("Tapez 3 pour Exterminate");
+    	for(int i=0;i<3;i++) {
+    		System.out.println("Choisissez l'action num "+i+".");
+    		command=scanner.nextInt();
+    		while(command!=1&&command!=2&&command!=3) {
+    			System.out.println("Le nombre entré n'est pas valide.");
+    			System.out.println("Tapez 1 pour Expand");
+    	    	System.out.println("Tapez 2 pour Explore");
+    	    	System.out.println("Tapez 3 pour Exterminate");
+    	    	command=scanner.nextInt();
+    		}
+    		this.commands.add(command);
+    	}
+    }
+
     public String getName() {
 		return name;
 	}

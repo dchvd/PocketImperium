@@ -1,26 +1,65 @@
 package pocket_imperium;
 
 import java.util.List;
+import java.util.Scanner;
+import java.util.ArrayList;
 
 public class Player {
     private String name;
     private GameStrategy strategy;
-    private List<Ship> ships; 
-    private List<Command> commands; 
+    private Color couleur;
+    private ArrayList<Ship> ships; 
+    private ArrayList<Command> commands; 
     private boolean isVirtual;
     private boolean controllsTriPrime;
     
     //ajouter une liste des Hex controllés
 
-    public Player(String name, boolean isVirtual, GameStrategy strategy) {
+    public Player(String name, boolean isVirtual, GameStrategy strategy, Color couleur) {
         this.name = name;
         this.isVirtual = isVirtual;
         this.strategy = strategy;
         this.commands = new ArrayList<>();
         this.ships = new ArrayList<>();
+        this.couleur=couleur;
     }
     
-  
+    public SectorCard chooseSector(Board plat) {
+    	System.out.print(this.name);
+    	System.out.println( ": Choisissez sur quel secteur vous souhaitez gagner des points ");
+    	plat.printCards();
+    	plat.printBoard();
+    	try (Scanner sc = new Scanner(System.in)) {
+    		//Recupérer secteur
+    		int x = 0;
+    		int y = 0;
+    		boolean coordXValide = false;
+    		boolean coordYValide = false;
+    		while (coordXValide) {
+    			System.out.print("Vous souhaitez la carte de la ligne (0 à 2) : ");
+    			coordXValide = sc.hasNextInt();
+    			if (coordXValide==true) {
+    				x = sc.nextInt();
+    				if (x!=0 ||x!=1 ||x!=2) {
+    					coordXValide = false;
+    					}
+    				}
+    			}
+    		while (coordYValide) {
+    			System.out.print(" et de la colonne (0 à 2) : ");
+    			coordYValide = sc.hasNextInt();
+    			if (coordYValide==true) {
+    				y = sc.nextInt();
+    				if (y!=0 ||y!=1 ||y!=2) {
+    					coordYValide = false;
+    					}
+    				}else {
+    					System.out.print(" Entrée incorrecte ");
+    					}
+    			}
+    		return plat.getBoard()[x][y]; 
+    		}
+    	}
 
     public String getName() {
 		return name;
@@ -52,7 +91,7 @@ public class Player {
 
 
 
-	public void setShips(List<Ship> ships) {
+	public void setShips(ArrayList<Ship> ships) {
 		this.ships = ships;
 	}
 
@@ -64,7 +103,7 @@ public class Player {
 
 
 
-	public void setCommands(List<Command> commands) {
+	public void setCommands(ArrayList<Command> commands) {
 		this.commands = commands;
 	}
 
@@ -104,7 +143,7 @@ public class Player {
 	 */
     public void Expand(int effectivness) {
     	for (int i;i<effectivness+1;i++) {
-			System.out.println("Choisissez un hex où vous souhatez ajouter un vaisseau");
+			System.out.println("Choisissez un hex où vous souhaitez ajouter un vaisseau");
 			Hex choosedHex=new Hex(); //récuperer depuis la console
 			boolean hexOccupiedByThisPlayer=Helper.TestOccupationPlayerHex(choosedHex, this);
 			while(hexOccupiedByThisPlayer==false) {
@@ -113,7 +152,7 @@ public class Player {
 				choosedHex=new Hex(); //récuperer depuis la console
 				hexOccupiedByThisPlayer=Helper.TestOccupationPlayerHex(choosedHex, this);
 			}
-			int nbShipsTotal=length(choosedHex.getShipsOnHex())+1;
+			int nbShipsTotal=choosedHex.getShipsOnHex().size() +1;
 			if(nbShipsTotal>choosedHex.getNbMaxShips()) {
 				System.out.println("Vous ne pouvez plus ajouter de vaiseaux sur cet hex car il est plein. Choisissez un autre hex.");
 			}else {
@@ -152,7 +191,7 @@ public class Player {
     				hexDestination=new Hex(); //prend la valeur indiquee dans la console
         			hexOccupied=Helper.TestOccupationHex(hexDestination);
     			}
-    			int nbShipsOnHex=hexDeparture.getShipsOnHex().length; //t'as compris l'idée
+    			int nbShipsOnHex=hexDeparture.getShipsOnHex().size(); 
     			//Faire un String toString pour renvoyer le nb de vaisseaux disponibles sur cet Hex et que le joueur peut bouger
     			System.out.println("Choisissez le nombre de vaisseaux que vous souhaitez déplacer");
     			int nbShipsToMove; //prend la valeur indiqué par le joueur dans la console
@@ -194,25 +233,37 @@ public class Player {
     }
     
     public void Exterminate(int effectivness) {
+    	ArrayList systemsToInvadeFrom= new ArrayList<Hex>();
+    	int nbShipsAttacker;
+    	boolean response=true;
     	for(int i=0;i<effectivness;i++) {
-    		System.out.println("Choisissez à partir de quel système que vous controllez vous souhaitez envahir.");
-    		Hex systemToInvadeFrom=new Hex(); //résultat à récuperer à partir de la console
+    		//L'attaquant choisit l'ensemble des hexs à partir desquels il veut attaquer ainsi que le nombre de vaisseau qu'il veut utiliser pour l'attaque
+    		while(response) {
+    			System.out.println("Choisissez à partir de quel système que vous controllez vous souhaitez envahir.");
+    			Hex systemToInvadeFrom=new Hex();//résultat à récuperer à partir de la console
+    			systemsToInvadeFrom.add(systemToInvadeFrom); 
+    			System.out.println("Choisissez le nombre de vaisseaux que vous souhaitez utiliser dans l'attaque.");
+    			nbShipsAttacker=3; //résultat à récupérer à partir de la console
+    			while(nbShipsAttacker>systemToInvadeFrom.getShipsOnHex().size()) {
+    				System.out.println("Vous n'avez pas suffisamment de vaisseaux sur cet hex. Choisissez un nombre plus petit.");
+    				nbShipsAttacker=2; //résultat à récuperer depuis la console
+    			}
+    			System.out.println("Souhaitez vous ajouter d'autres systèmes à partir desquels attaquer ?");
+    			response=false; //récuperer depuis la console
+    		}
+    		//Choix du système à envahir
     		System.out.println("Choisissez un système voisin à envahir.");
     		Hex systemToInvade=new Hex(); //résultat à récupere à partir de la console
-    		System.out.println("Choisissez le nombre de vaisseaux que vous souhaitez utiliser dans l'attaque.");
-    		int nbShipsAttacker; //résultat à récupérer à partir de la console
-    		int nbShipsDefendant=systemToInvade.getShipsOnHex().length; //je sais toujours pas faire les listes
+    		int nbShipsDefendant=systemToInvade.getShipsOnHex().size(); 
     		//Construit l'action
-    		Exterminate exterminate=new Exterminate(systemToInvade, systemToInvadeFrom, nbShipsAttacker, nbShipsDefendant, this);
-    		//Détermine le nombre de bateaux restants
-    		int nbShipsAttackerLeft=Exterminate.RemoveShipsAttacker(nbShipsAttacker, nbShipsDefendant);
-    		int nbShipsDefendantLeft=Exterminate.RemoveShipsDefendant(nbShipsAttackerLeft, nbShipsDefendant);
-    		//Détermine le gagnant
-    		if(nbShipsAttackerLeft>nbShipsDefendantLeft) {
-    			Helper.GainControllHex(systemToInvade, nbShipsAttackerLeft,this);
-    		}else if(nbShipsAttackerLeft<nbShipsDefendantLeft) {
-    			systemToInvade.setShipsOnHex(nbShipsDefendantLeft); 
+    		for (int j=0;j<systemsToInvadeFrom.size();j++) {
+    			Hex systemToInvadeFrom=systemsToInvadeFrom.get(j); //j'espere que ça marche pas juste parce que le tableau est vide
+    			Exterminate exterminate=new Exterminate(systemToInvade, systemToInvadeFrom, nbShipsAttacker, nbShipsDefendant, this);
+    			//Bouge les vaisseaux du système à partir duquel on attaque
+        		Helper.removeShipsFromHex(nbShipsAttacker, systemToInvadeFrom);
     		}
+    		//Détermine le gagnant
+    		System.out.println(Exterminate.DetermineWinner(nbShipsAttacker, nbShipsDefendant, systemToInvade, this));
     	}
     	
     }

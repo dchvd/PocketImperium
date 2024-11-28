@@ -142,14 +142,23 @@ public class Player {
 	 * @param effectivness détermine le nombre de vaisseaux que le joueur peut ajouter. Elle est définie en fonction du nombre de joueurs ayant choisi la même commande
 	 */
     public void Expand(int effectivness) {
-    	for (int i;i<effectivness+1;i++) {
+    	Scanner scanner=new Scanner(System.in);
+    	for (int i=0;i<effectivness+1;i++) {
 			System.out.println("Choisissez un hex où vous souhaitez ajouter un vaisseau");
-			Hex choosedHex=new Hex(); //récuperer depuis la console
+			System.out.println("Entrez le x du hex choisi.");
+			int x=scanner.nextInt(); 
+			System.out.println("Entrez le y du hex choisi.");
+			int y=scanner.nextInt();
+			Hex choosedHex=Board.determineHexFromCoordinates(x, y);
 			boolean hexOccupiedByThisPlayer=Helper.TestOccupationPlayerHex(choosedHex, this);
 			while(hexOccupiedByThisPlayer==false) {
 				choosedHex=null;
 				System.out.println("Vous n'occupez pas le hex choisi. Veuillez choisir un hex que vous occupez.");
-				choosedHex=new Hex(); //récuperer depuis la console
+				System.out.println("Entrez le x du hex choisi.");
+				x=scanner.nextInt(); 
+				System.out.println("Entrez le y du hex choisi.");
+				y=scanner.nextInt();
+				choosedHex=Board.determineHexFromCoordinates(x, y);
 				hexOccupiedByThisPlayer=Helper.TestOccupationPlayerHex(choosedHex, this);
 			}
 			int nbShipsTotal=choosedHex.getShipsOnHex().size() +1;
@@ -167,34 +176,51 @@ public class Player {
      * Elle verifie egalement que le joueur deplace sa flotte sur un hex voisin, et pas sur un hex trop eloigne. 
      * @param effectivness determine le nombre de flottes que le joueur peut bouger. Elle est definie en fonction du nombre de joueurs ayant choisi la meme commande
      */
-    //illisible - mettre des méthodes dans la classe HelperExplore
     public void Explore(int effectivness) {
-    	for(int i;i<effectivness+1;i++) {
+    	for(int i=0;i<effectivness+1;i++) {
     		boolean response=true;
     		int nbMovement=0; 
+    		Scanner scanner = new Scanner(System.in);
     		System.out.println("Choisissez un hex d'où vous voulez partir");
     		//Afficher la liste des hex controllés par le joueur
-			Hex hexDeparture=new Hex(); //prend la valeur indiqué par le joueur dans la console
+    		System.out.println("Entrez le x du hex choisi.");
+    		int xDeparture=scanner.nextInt();
+    		System.out.println("Entrez le y du hex choisi");
+    		int yDeparture=scanner.nextInt();
+			Hex hexDeparture=Board.determineHexFromCoordinates(xDeparture, yDeparture);
+			
 			//Checker si le joueur a bien choisi un hex qu'il controle
 			boolean hexOccupiedByThisPlayer=Helper.TestOccupationPlayerHex(hexDeparture, this);
-			while(hexOccupiedByThisPlayer==false) {
+			while(!hexOccupiedByThisPlayer) {
 				System.out.println("Vous n'occupez pas le hex choisi. Veuillez choisir un hex que vous occupez.");
-				hexDeparture=new Hex(); //prend la valeur indiqué par le joueur dans la console
+				System.out.println("Entrez le x du hex choisi.");
+	    		xDeparture=scanner.nextInt();
+	    		System.out.println("Entrez le y du hex choisi");
+	    		yDeparture=scanner.nextInt();
+				hexDeparture=Board.determineHexFromCoordinates(xDeparture, yDeparture);
 				hexOccupiedByThisPlayer=Helper.TestOccupationPlayerHex(hexDeparture, this);
 			}
-    		while(response==true) { 
+    		while(response) { 
     			System.out.println("Choisissez le hex où vous souhaitez aller");
-    			Hex hexDestination=new Hex(); //prend la valeur indiquée dans la console
+    			System.out.println("Entrez le x du hex choisi.");
+        		int xDestination=scanner.nextInt();
+        		System.out.println("Entrez le y du hex choisi");
+        		int yDestination=scanner.nextInt();
+    			Hex hexDestination=Board.determineHexFromCoordinates(xDeparture, yDeparture);
     			boolean hexOccupied=Helper.TestOccupationHex(hexDestination);
     			while(hexOccupied==true) {
     				System.out.println("Le hex que vous avez choisi est occupé par un autre joueur. Choisissez un autre hex.");
-    				hexDestination=new Hex(); //prend la valeur indiquee dans la console
+    				System.out.println("Entrez le x du hex choisi.");
+    	    		xDestination=scanner.nextInt();
+    	    		System.out.println("Entrez le y du hex choisi");
+    	    		yDestination=scanner.nextInt();
+    				hexDestination=Board.determineHexFromCoordinates(xDeparture, yDeparture);
         			hexOccupied=Helper.TestOccupationHex(hexDestination);
     			}
     			int nbShipsOnHex=hexDeparture.getShipsOnHex().size(); 
     			//Faire un String toString pour renvoyer le nb de vaisseaux disponibles sur cet Hex et que le joueur peut bouger
     			System.out.println("Choisissez le nombre de vaisseaux que vous souhaitez déplacer");
-    			int nbShipsToMove; //prend la valeur indiqué par le joueur dans la console
+    			int nbShipsToMove=scanner.nextInt(); 
     			if (nbShipsToMove>nbShipsOnHex) {
     				System.out.println("Impossible de prendre plus de vaisseaux qu'il n'y en a. Choisissez un nombre plus petit.");
     			}else if(nbShipsToMove<0) {
@@ -214,8 +240,13 @@ public class Player {
     			}
     			nbMovement+=1;
     			if((nbMovement<2)&&(hexDeparture.isTriPrime()!=true)) {
-    				System.out.println("Souhaitez-vous bouger de nouveau votre flotte ?");
-        			if(non) {
+    				System.out.println("Souhaitez-vous bouger de nouveau votre flotte ? Entrez 'oui' ou 'non'.");
+    				String answer=scanner.nextLine();
+    				while(answer!="oui"||answer!="non") {
+    					System.out.println("Souhaitez-vous bouger de nouveau votre flotte ? Entrez 'oui' ou 'non'.");
+        				answer=scanner.nextLine();
+    				}
+        			if(answer=="non") {
         				nbMovement=0;
         				response=false;
         				hexDeparture.setControlledBy(this); 
@@ -235,26 +266,42 @@ public class Player {
     public void Exterminate(int effectivness) {
     	ArrayList systemsToInvadeFrom= new ArrayList<Hex>();
     	int nbShipsAttacker;
+    	Scanner scanner = new Scanner(System.in);
     	boolean response=true;
     	for(int i=0;i<effectivness;i++) {
     		//L'attaquant choisit l'ensemble des hexs à partir desquels il veut attaquer ainsi que le nombre de vaisseau qu'il veut utiliser pour l'attaque
     		while(response) {
     			System.out.println("Choisissez à partir de quel système que vous controllez vous souhaitez envahir.");
-    			Hex systemToInvadeFrom=new Hex();//résultat à récuperer à partir de la console
+    			System.out.println("Entrez le x du systeme choisi.");
+        		int xInvadeFrom=scanner.nextInt();
+        		System.out.println("Entrez le y du systeme choisi");
+        		int yInvadeFrom=scanner.nextInt();
+    			Hex systemToInvadeFrom=Board.determineHexFromCoordinates(xInvadeFrom, yInvadeFrom);
     			systemsToInvadeFrom.add(systemToInvadeFrom); 
     			System.out.println("Choisissez le nombre de vaisseaux que vous souhaitez utiliser dans l'attaque.");
-    			nbShipsAttacker=3; //résultat à récupérer à partir de la console
+    			nbShipsAttacker=scanner.nextInt();
     			while(nbShipsAttacker>systemToInvadeFrom.getShipsOnHex().size()) {
     				System.out.println("Vous n'avez pas suffisamment de vaisseaux sur cet hex. Choisissez un nombre plus petit.");
-    				nbShipsAttacker=2; //résultat à récuperer depuis la console
+    				nbShipsAttacker=scanner.nextInt();
     			}
-    			System.out.println("Souhaitez vous ajouter d'autres systèmes à partir desquels attaquer ?");
-    			response=false; //récuperer depuis la console
+    			System.out.println("Souhaitez vous ajouter d'autres systèmes à partir desquels attaquer ? Entrez 'oui' ou 'non'.");
+    			String answer=scanner.nextLine();
+    			while(answer!="oui"||answer!="non") {
+    				System.out.println("Entrez 'oui' ou 'non'.");
+    				answer=scanner.nextLine();
+    			}
+    			if(answer=="non") {
+    				response=false;
+    			}
     		}
     		//Choix du système à envahir
     		System.out.println("Choisissez un système voisin à envahir.");
-    		Hex systemToInvade=new Hex(); //résultat à récupere à partir de la console
-    		int nbShipsDefendant=systemToInvade.getShipsOnHex().size(); 
+    		System.out.println("Entrez le x du hex choisi.");
+    		int xInvade=scanner.nextInt();
+    		System.out.println("Entrez le y du hex choisi");
+    		int yInvade=scanner.nextInt();
+			Hex systemToInvade=Board.determineHexFromCoordinates(xInvade, yInvade);
+			int nbShipsDefendant=systemToInvade.getShipsOnHex().size();
     		//Construit l'action
     		for (int j=0;j<systemsToInvadeFrom.size();j++) {
     			Hex systemToInvadeFrom=systemsToInvadeFrom.get(j); //j'espere que ça marche pas juste parce que le tableau est vide

@@ -1,5 +1,7 @@
 package pocket_imperium;
 
+import java.util.ArrayList;
+
 public class Helper {
 	/**
      * La fonction TestOccupationHex permet de vérifier si le hex choisi est occupé par un joueur ou non
@@ -37,7 +39,12 @@ public class Helper {
     public static void GainControllHex(Hex hex, int nbShips,Player player) {
     	hex.setControlled(true);
     	hex.setControlledBy(player);
-    	hex.setShipsOnHex(nbShips);
+    	ArrayList<Ship> newShipsOnHex=hex.getShipsOnHex();
+    	for(int i=0;i<nbShips;i++) {
+    		Ship newShip= new Ship(player); //qu'est-ce qu'on fait avec la couleur ducoup ? 
+    		newShipsOnHex.add(newShip);
+    	}
+    	hex.setShipsOnHex(newShipsOnHex);
 		
 	}
     
@@ -77,5 +84,18 @@ public class Helper {
 			return false;
 		}
     }
+	
+	/**
+	 * La fonction removeShipsFromHex permet de retirer des vaisseaux du joueur d'un des Hex qu'il contrôle
+	 * @param nbShips correspond au nombre de vaisseaux que possede le joueur sur le hex
+	 * @param hex correspond au hex controlle par la joueur duquel on veut retirer des vaisseaux
+	 */
+	public static void removeShipsFromHex(int nbShips, Hex hex) {
+		ArrayList<Ship> newShipsOnHex=hex.getShipsOnHex();
+		for (int i=0;i<nbShips;i++) {
+			newShipsOnHex.remove(i);
+		}
+		hex.setShipsOnHex(newShipsOnHex);
+	}
 
 }

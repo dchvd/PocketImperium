@@ -163,14 +163,4 @@ public class SectorCard {
         	} 
         }
     }
-
-    /*public static void main (String[] Args) {
-    	SectorCard carteMilieu = new SectorCard("CentralCard");
-    	SectorCard carteExt = new SectorCard("ExteriorCard");
-    	SectorCard carteMilExt = new SectorCard("MiddleExteriorCard");
-    	System.out.println(carteMilieu);
-    	System.out.println(carteExt);
-    	System.out.println(carteMilExt);	
-    }*/
-
 }

@@ -1,6 +1,7 @@
 package pocket_imperium;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * La classe Partie permet de gérer le déroulement d'une partie de Imperium Pocket.
@@ -35,7 +36,7 @@ public class Partie {
      * Le constructeur Partie permet de créer une partie du jeu Imperium Pocket
      * @param players est la liste des joueurs qui s'affronteront durant la partie
      */
-    public Partie(List<Player> players) {
+    public Partie(ArrayList<Player> players) {
     	this.players = players;
     }
     
@@ -57,7 +58,7 @@ public class Partie {
      */
     private void Tour() {
     	System.out.println("Tour " + tour);
-    	ArrayList <SectorCard> chosenSectors=null;
+    	ArrayList <SectorCard> chosenSectors=new ArrayList<>();
     	for (Player player : players) {
     		player.planCommands("1", "2", "3");// faux
     		player.executeCommands();
@@ -68,8 +69,7 @@ public class Partie {
     		}
 
     	 //calcul de scores
-
-    	 }
+     	 }
 
 
     
@@ -78,7 +78,6 @@ public class Partie {
      * joueur est éliminé
      * @return false si ce n'est pas encore la fin de la partie, true si c'est la fin de la partie
      */
-    
     private boolean finPartie() {
     	if (this.tour>9) {
     		return true; //ajouter l'option du si joueur éliminé
@@ -92,7 +91,15 @@ public class Partie {
     }
     
     public static void main(String [] args) {
-    	Partie partie1=new Partie();
+    	Player player1 = new Player(false);
+    	Player player2 = new Player(false);
+    	Player player3 = new Player(false);
+    	
+    	/*
+    	ArrayList<Player> players=new ArrayList<>();
+    	players.add(new Player(false));
+    	players.add(new Player(false));
+    	players.add(new Player(false));*/
+    	//Partie partie1=new Partie(players);
     }
-
 }

@@ -157,4 +157,9 @@ public class Board {
     public SectorCard[][] getBoard(){
     	return this.board;
     }
+
+	public static Hex determineHexFromCoordinates(int x, int y) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

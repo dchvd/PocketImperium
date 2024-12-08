@@ -1,3 +1,4 @@
+
 package pocket_imperium;
 
 import java.util.List;
@@ -15,13 +16,17 @@ public class Player {
     
     //ajouter une liste des Hex controllés
 
-    public Player(String name, boolean isVirtual, GameStrategy strategy, Color couleur) {
-        this.name = name;
+    public Player(boolean isVirtual) {
+        // Demander le nom 
+    	Scanner sc = new Scanner(System.in);
+    	System.out.print("Entrez votre surnom : ");
+    	this.name = sc.nextLine();
+       	System.out.print("Bienvenue nouveau joueur : ");
         this.isVirtual = isVirtual;
-        this.strategy = strategy;
-        this.commands = new ArrayList<>();
+        //this.strategy = strategy;
+        //this.commands = new ArrayList<>();
         this.ships = new ArrayList<>();
-        this.couleur=couleur;
+        //this.couleur=couleur;
     }
     
     public SectorCard chooseSector(Board plat) {
@@ -359,7 +364,7 @@ public class Player {
     public boolean isWinner() {
     	
     }
-    
+
     
 }
 

@@ -1,6 +1,7 @@
 package pocket_imperium;
 
 import java.util.ArrayList;
+import java.util.Scanner;
 
 /**
  * La classe Partie permet de gérer le déroulement d'une partie de Imperium Pocket.
@@ -35,7 +36,7 @@ public class Partie {
      * Le constructeur Partie permet de créer une partie du jeu Imperium Pocket
      * @param players est la liste des joueurs qui s'affronteront durant la partie
      */
-    public Partie(List<Player> players) {
+    public Partie(ArrayList<Player> players) {
     	this.players = players;
     }
     
@@ -48,6 +49,66 @@ public class Partie {
             tour++;
         }
         declareWinner();
+    }
+    
+    public void perform() {
+    	Scanner scanner = new Scanner(System.in);
+    	for(int i=1;i<4;i++) {
+    		//Afficher la commande numero i de chaque joueur
+    		System.out.println("Voici les commandes numero "+i+" de chaque joueur!");
+    		for(int j=0; j<players.size();j++) {
+    			Player player=players.get(j);
+    			int command =player.getCommands().get(i);
+    			System.out.print(player+": ");
+    			if(command==1) {
+    				System.out.println("Expand");
+    			}else if(command==2) {
+    				System.out.println("Explore");
+    			}else if(command==3) {
+    				System.out.println("Exterminate");
+    			}
+    		}
+    		//Determiner l'effectiveness pour chaque commande
+    		int effectivenessExpand=4, effectivenessExplore=4, effectivenessExterminate=4;
+    		for(int k=0;k<players.size();k++) {
+    			if(players.get(k).getCommands().get(i)==1) {
+    				effectivenessExpand--;
+    			}
+    			if(players.get(k).getCommands().get(i)==2) {
+    				effectivenessExplore--;
+    			}
+    			if(players.get(k).getCommands().get(i)==3) {
+    				effectivenessExterminate--;
+    			}
+    			
+    		}
+    		
+    		//executer les commandes dans l'ordre suivant: Expand puis Explore puis Exterminate
+    		for(int j=0; j<players.size();j++) {
+        		Player player=players.get(j); //ok si la liste des joueurs est organisee de sorte à ce que le premier est le joueur principal
+        		System.out.println(player + ", souhaitez-vous performer cette commande? Répondez par 1 pour oui et 0 pour non"); //donne la possibilite au joueur d'effectuer sa commande ou non
+        		int response=scanner.nextInt();
+        		while((response!=1)&&(response!=0)) {
+        			System.out.println("Reponse non valide.");
+        			System.out.println(player + ", souhaitez-vous performer cette commande? Répondez par 1 pour oui et 0 pour non");
+            		response=scanner.nextInt();
+        		}
+        		if(response==1) {
+        			if (player.getCommands().get(i)==i) {
+        				if(i==1) {
+        					player.Expand(effectivenessExpand);
+        				}else if(i==2) {
+        					player.Explore(effectivenessExplore);
+        				}else if(i==3) {
+        					player.Exterminate(effectivenessExterminate);
+        				}
+        			}
+        		}else {
+        			System.out.println("Votre choix a bien été pris en compte. Vous n'effectuerez pas cette commande.");
+        		}
+        		
+    		}
+    	}
     }
     
     /**
@@ -70,6 +131,7 @@ public class Partie {
     	 //calcul de scores
 
     	 }
+    
 
 
     

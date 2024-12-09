@@ -3,6 +3,65 @@ package pocket_imperium;
 import java.util.ArrayList;
 
 public class Helper {
+
+	public static int[][] placeSystems (String typeCarte) {
+		Random randomNumbers = new Random();	
+		int empPossible;
+		if (typeCarte=="ExteriorCard") {
+			empPossible = 5;
+		}else {
+			empPossible=4;
+		}
+	    boolean ValidPlacement = false;	
+	    int[][] coordSyst = {{0,0},{0,0},{0,0}};
+	    int[] placements = {0,0,0};
+	    while (!ValidPlacement) {
+	    	for (int i = 0; i<placements.length; i++) {
+	    		placements[i]=randomNumbers.nextInt(empPossible);
+	    	}
+	        if (placements[0] !=placements[1] && placements[0] !=placements[2] ) {
+	        	ValidPlacement=true;
+	        }
+	    }
+	    for (int i = 0; i<placements.length; i++) {
+	    	if (typeCarte =="ExteriorCard") {
+		    	if (placements[i]==0) {
+		    		coordSyst[i][0]=0;
+		    		coordSyst[i][1]=0;
+		    	}else if (placements[i]==1) {
+		    		coordSyst[i][0]=0;
+		    		coordSyst[i][1]=1;
+		    	}else if (placements[i]==2) {
+		    		coordSyst[i][0]=1;
+		    		coordSyst[i][1]=1;
+		    	}else if (placements[i]==3) {
+		    		coordSyst[i][0]=2;
+		    		coordSyst[i][1]=0;
+		    	}else{
+		    		coordSyst[i][0]=2;
+		    		coordSyst[i][1]=1;
+		    	}
+		    	
+		    }else if (typeCarte =="MiddleExteriorCard") {
+		    	if (placements[i]==0) {
+		    		coordSyst[i][0]=0;
+		    		coordSyst[i][1]=0;
+		    	}else if (placements[i]==1) {
+		    		coordSyst[i][0]=1;
+		    		coordSyst[i][1]=0;
+		    	}else if (placements[i]==2) {
+		    		coordSyst[i][0]=1;
+		    		coordSyst[i][1]=1;
+		    	}else {
+		    		coordSyst[i][0]=2;
+		    		coordSyst[i][1]=0;
+		    	}
+		    }else {
+		    	System.out.println("problème de type de carte");
+		    }
+	    }
+	    return coordSyst;
+	}
 	/**
      * La fonction TestOccupationHex permet de vérifier si le hex choisi est occupé par un joueur ou non
      * @param hex est le hex dont on souhaite vérifier l'occupation

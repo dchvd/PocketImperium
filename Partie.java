@@ -51,6 +51,9 @@ public class Partie {
         declareWinner();
     }
     
+    /**
+     * La methode perform permet aux joueurs de réaliser les commandes Expand, Explore et Exterminate
+     */
     public void perform() {
     	Scanner scanner = new Scanner(System.in);
     	for(int i=1;i<4;i++) {
@@ -110,6 +113,18 @@ public class Partie {
     		}
     	}
     }
+    
+    /**
+     * La methode endOfRound permet d'echanger les places du premier et du dernier joueur de la liste, afin que le dernier joueur de la liste devienne le Start Player
+     */
+   public void endOfRound() {
+	   Player startPlayer = this.players.getFirst();
+	   Player newStartPlayer=this.players.getLast();
+	   this.players.removeFirst();
+	   this.players.removeLast();
+	   this.players.addFirst(newStartPlayer);
+	   this.players.addLast(startPlayer);
+   }
     
     /**
      * Fonction caractéristique d'un tour qui permet à chaque joueur à tour de rôle de choisir l'ordre des commandes,

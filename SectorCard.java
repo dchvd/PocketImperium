@@ -9,6 +9,7 @@ public class SectorCard {
     private String type; //MiddleExteriorCard ou CentralCard ou ExteriorCard
     private String name;
     private List<Hex> hexes= new ArrayList<>();
+    private boolean isAlreadyChoosed=false; // NOUVEAU
 	private boolean estTriPrime=false;
 	
     /**
@@ -64,6 +65,13 @@ public class SectorCard {
     	}
     }
     
+    // deux prochaines fonctions : nouvelles
+    public boolean getIsAlreadyChosen() {
+    	return this.isAlreadyChoosed;
+    }
+    public void isChoosed() {
+    	this.isAlreadyChoosed=true;
+    }
     public List<Hex> getHexes() {
         return hexes;
     }
@@ -163,14 +171,4 @@ public class SectorCard {
         	} 
         }
     }
-
-    /*public static void main (String[] Args) {
-    	SectorCard carteMilieu = new SectorCard("CentralCard");
-    	SectorCard carteExt = new SectorCard("ExteriorCard");
-    	SectorCard carteMilExt = new SectorCard("MiddleExteriorCard");
-    	System.out.println(carteMilieu);
-    	System.out.println(carteExt);
-    	System.out.println(carteMilExt);	
-    }*/
-
 }

@@ -52,7 +52,7 @@ public class Hex {
 	public void setControlledBy(Player controlledBy) {
 		this.controlledBy = controlledBy;
 	}
-	public void setCoordinates(double x, double y) {
+	public void setCoordinates(int x, int y) {
 		this.xPosition = x; 
 		this.yPosition = y;
 	}
@@ -60,9 +60,43 @@ public class Hex {
     public String toString() {
         return "Hex{" +
                 " x='" + xPosition + '\'' +
-                " y='" + yPoosition + '\'' +
+                " y='" + yPosition + '\'' +
                 " value='" + value + '\'' +
                 '}';
     }
+	public int getxPosition() {
+		return xPosition;
+	}
+
+	public int getyPosition() {
+		return yPosition;
+	}
+	
+	public ArrayList<Ship> getShipsOnHex() {
+		return shipsOnHex;
+	}
+	public void setShipsOnHex(ArrayList<Ship> shipsOnHex) {
+		this.shipsOnHex = shipsOnHex;
+	}
+	public int getValue() {
+		return value;
+	}
+	
+	public int getNbMaxShips() {
+		return nbMaxShips;
+	}
+	
+	public boolean isTriPrime() {
+		return triPrime;
+	}
+	
+	public boolean isSystemHex1() {
+		return systemHex1;
+	}
+	
+	public boolean isSystemHex2() {
+		return systemHex2;
+	}
+	
 	
 }

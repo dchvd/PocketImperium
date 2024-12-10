@@ -1,8 +1,10 @@
+
 package pocket_imperium;
 
 import java.util.List;
 import java.util.Scanner;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.Arrays;
 
 public class Player {
@@ -16,23 +18,43 @@ public class Player {
     private ArrayList<Hex> controlledHexs;
     
     
+    public Player() {
+    	Scanner sc = new Scanner(System.in);
+    	
+    	// Demande si le joueur est virtuel
+    	while (true) {
+    		System.out.println("Le joueur est-il humain? Entrez oui ou non : ");
+        	String estVirtuel = sc.nextLine();
+    		if (estVirtuel.equals("oui")) {
+    			System.out.print("    Entrez votre surnom : ");
+    	    	this.name = sc.nextLine();
+    	       	System.out.println("Bienvenue " + this.name);
+    	       	break;
+    		}else if (estVirtuel.equals("non")) {
+    			// Demander le surnom
+    	    	System.out.println("    Entrez le surnom du joueur virtuel : ");
+    	    	this.name = sc.nextLine();
+    	    	System.out.println(" Assignation d'une stratégie secrète au joueur virtuel...");
+    	    	Random randomNumbers = new Random();
+    	    	int numStrategie = randomNumbers.nextInt(6);
+    	    	//GameStrategy randomStrategy= GameStrategy ;
+    	    	//this.strategy = randomStrategy;
+    	    	break;
+    		}else {
+    			System.out.println("Mauvaise saisie, veuillez recommencer");
+    		}
+    	}        
+        this.ships = new ArrayList<>();
+  }
+    
     public ArrayList<Hex> getControlledHexs() {
-		return controlledHexs;
+		  return controlledHexs;
 	}
 
 	public void setControlledHexs(ArrayList<Hex> controlledHexs) {
 		this.controlledHexs = controlledHexs;
 	}
 
-	public Player(String name, boolean isVirtual) { //, GameStrategy strategy, Color couleur
-        this.name = name;
-        this.isVirtual = isVirtual;
-        //this.strategy = strategy;
-        this.commands = new ArrayList<>();
-        this.ships = new ArrayList<>();
-        this.controlledHexs=new ArrayList<>();
-        //this.couleur=couleur;
-    }
     
     public SectorCard chooseSector(Board plat) {
     	System.out.print(this.name);
@@ -419,7 +441,7 @@ public class Player {
     	player1.Explore(2);
     	player1.Exterminate(1);
     }
-    
+
     
 }
 

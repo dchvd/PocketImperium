@@ -5,7 +5,7 @@ public class Exterminate{
 	private Hex systemToInvadeFrom;
 	private int nbShipsAttacker;
 	private int nbShipsDefendant;
-	
+
 	/**
 	 * Le constructeur Exterminate permet de vérifier que tous les choix faits par les joueurs sont corrects avant de lancer l'action
 	 * @param systemToInvade est le système que le joueur souhaite envahir
@@ -43,18 +43,18 @@ public class Exterminate{
 			this.systemToInvade=null;
 			System.out.println("Veuillez choisir un système (1, 2 ou TriPrime) à envahir.");
 		}
-		
+
 		//Déterminer le nombre de vaisseaux de l'attaquant
 		if(nbShipsAttacker<=systemToInvadeFrom.getShipsOnHex().size()) {
 			this.nbShipsAttacker=nbShipsAttacker;
 		}else {
 			System.out.println("Vous n'avez pas autant de vaisseau sur votre hex. Choisissez un nombre de vaisseaux plus petit.");
 		}
-		
+
 		//Déterminer le nombre de vaisseaux du défendant
 		this.nbShipsDefendant=nbShipsDefendant;
 	}
-	
+
 	/**
 	 * La methode RemoveShipsAttacker permet de calculer le nombre de vaisseaux de l'attaquant restants après l'attaque
 	 * @param nbShipsAttacker est le nombre de vaisseaux de l'attaquant
@@ -69,7 +69,7 @@ public class Exterminate{
 			return 0;
 		}
 	}
-	
+
 	/**
 	 * La methode RemoveShipsAttacker permet de calculer le nombre de vaisseaux du defendant restants après l'attaque
 	 * @param nbShipsAttacker est le nombre de vaisseaux de l'attaquant
@@ -84,7 +84,7 @@ public class Exterminate{
 			return 0;
 		}
 	}
-	
+
 	/**
 	 * La methode determineWinner permet de déterminer le joueur qui controle le systeme apres a la fin de l'execution de la commande Exterminate
 	 * @param nbShipsAttacker est le nombre de vaisseaux du joueur qui attaque le systeme
@@ -94,7 +94,7 @@ public class Exterminate{
 	 * @return un message in diquant lequel des deux joueurs controle le systeme a la fin de l'execution de Exterminate, ou si le systeme n'est plus sous controlle. 
 	 */
 	public static String DetermineWinner(int nbShipsAttacker, int nbShipsDefendant, Hex systemToInvade, Player attacker) {
-	
+
 		if(nbShipsAttacker==nbShipsDefendant) {
 			systemToInvade.setShipsOnHex(null);
 			systemToInvade.setControlled(false);
@@ -103,7 +103,7 @@ public class Exterminate{
 		}else {
 			int nbShipsAttackerLeft=RemoveShipsAttacker(nbShipsAttacker, nbShipsDefendant);
 			int nbShipsDefendantLeft=RemoveShipsDefendant(nbShipsAttackerLeft, nbShipsDefendant);
-			
+
 			if(nbShipsAttackerLeft>nbShipsDefendantLeft) {
 				Helper.GainControllHex(systemToInvade, nbShipsAttackerLeft,attacker);
 				return "Le gagnant est l'attaquant: il contrôle désormais le système attaqué";

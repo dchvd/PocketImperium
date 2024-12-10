@@ -1,6 +1,6 @@
 package pocket_imperium;
 
-public enum Effectivness {
+public enum Effectiveness {
 		EFF_nulle(0),
 		EFF_min(1),
 		EFF_moy(2),
@@ -10,7 +10,7 @@ public enum Effectivness {
 	private int eff;
 	
 	//Constructeur
-	private Effectivness(int eff) {
+	private Effectiveness(int eff) {
 		this.eff=eff;
 	}
 }

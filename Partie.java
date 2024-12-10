@@ -67,8 +67,8 @@ public class Partie {
 				Hex choosedHex=this.gameBoard.determineHexFromCoordinates(x, y); // pourquoi elle est statique
 				if(this.gameBoard.verifyCapacibility(choosedHex)) {
 	            	System.out.println("Secteur valide");
-	            	//choosedHex.isControlled = true;
-	            	//choosedHex.isControlledBy(player);
+	            	choosedHex.isControlled = true;
+	            	choosedHex.isControlledBy(player);
 	            	break;
 
 				}else {

@@ -157,9 +157,28 @@ public class Board {
     public SectorCard[][] getBoard(){
     	return this.board;
     }
-
+    public List<List<Hex>> getGameBoard(){
+    	return this.gameBoard;
+    }
 	public static Hex determineHexFromCoordinates(int x, int y) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	public boolean verifyCapacibility(Hex choosedHex) {
+		for (SectorCard[] rangee: this.board) {
+			for (SectorCard card : rangee) {
+		        if (card.getHexes().contains(choosedHex)) {
+		            System.out.println("Hex trouvé dans le secteur Carte");
+		            if (!card.getIsAlreadyChosen()){
+		            	card.isChoosed();
+		            	return true;
+		            }else {
+		            	return false;
+		            }
+		        }
+		    }
+		}
+		System.out.println("Hex non trouvée");
+		return false;
 	}
 }

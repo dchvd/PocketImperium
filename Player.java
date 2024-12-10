@@ -4,6 +4,7 @@ package pocket_imperium;
 import java.util.List;
 import java.util.Scanner;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Player {
     private String name;
@@ -15,16 +16,33 @@ public class Player {
     private boolean controllsTriPrime;
     
     //ajouter une liste des Hex controllés
-
-    public Player(boolean isVirtual) {
-        // Demander le nom 
+    
+    public Player() {
     	Scanner sc = new Scanner(System.in);
-    	System.out.print("Entrez votre surnom : ");
-    	this.name = sc.nextLine();
-       	System.out.print("Bienvenue nouveau joueur : ");
-        this.isVirtual = isVirtual;
-        //this.strategy = strategy;
-        //this.commands = new ArrayList<>();
+    	
+    	// Demande si le joueur est virtuel
+    	while (true) {
+    		System.out.println("Le joueur est-il humain? Entrez oui ou non : ");
+        	String estVirtuel = sc.nextLine();
+    		if (estVirtuel.equals("oui")) {
+    			System.out.print("    Entrez votre surnom : ");
+    	    	this.name = sc.nextLine();
+    	       	System.out.println("Bienvenue " + this.name);
+    	       	break;
+    		}else if (estVirtuel.equals("non")) {
+    			// Demander le surnom
+    	    	System.out.println("    Entrez le surnom du joueur virtuel : ");
+    	    	this.name = sc.nextLine();
+    	    	System.out.println(" Assignation d'une stratégie secrète au joueur virtuel...");
+    	    	Random randomNumbers = new Random();
+    	    	int numStrategie = randomNumbers.nextInt(6);
+    	    	//GameStrategy randomStrategy= GameStrategy ;
+    	    	//this.strategy = randomStrategy;
+    	    	break;
+    		}else {
+    			System.out.println("Mauvaise saisie, veuillez recommencer");
+    		}
+    	}        
         this.ships = new ArrayList<>();
         //this.couleur=couleur;
     }

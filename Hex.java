@@ -17,8 +17,8 @@ public class Hex {
 	private Player controlledBy=null;
 	
 	public Hex(int x, int y, boolean triPrime, boolean systemHex1, boolean systemHex2) {
-		this.x_position=x;
-		this.y_position=y;
+		this.xPosition=x;
+		this.yPosition=y;
 		this.triPrime=triPrime;
 		this.systemHex1=systemHex1;
 		this.systemHex2=systemHex2;
@@ -49,14 +49,14 @@ public class Hex {
 		this.controlledBy = controlledBy;
 	}
 	public void setCoordinates(double x, double y) {
-		this.x_position = x; 
-		this.y_position = y;
+		this.xPosition = x; 
+		this.yPosition = y;
 	}
 	@Override
     public String toString() {
         return "Hex{" +
-                " x='" + x_position + '\'' +
-                " y='" + y_position + '\'' +
+                " x='" + xPosition + '\'' +
+                " y='" + yPoosition + '\'' +
                 " value='" + value + '\'' +
                 '}';
     }

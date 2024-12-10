@@ -25,12 +25,16 @@ public class Hex {
 		
 		if(triPrime==true) {
 			value = 3;
+			this.nbMaxShips=4;
 		}else if (systemHex2==true){
 			value = 2;
+			this.nbMaxShips=3;
 		}else if (systemHex1==true){
 			value = 1;
+			this.nbMaxShips=2;
 		}else {
 			value=0;
+			this.nbMaxShips=1; // potentiellement 0
 		}
 	}
 	public boolean isControlled() {

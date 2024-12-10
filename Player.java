@@ -266,7 +266,7 @@ public class Player {
     		int yDeparture=scanner.nextInt();
 			Hex hexDeparture=Board.determineHexFromCoordinates(xDeparture, yDeparture);
 			
-			//Checker si le joueur a bien choisi un hex qu'il controle
+			//Le joueur choisit le hex duquel il veut partir
 			boolean hexOccupiedByThisPlayer=Helper.TestOccupationPlayerHex(hexDeparture, this);
 			while(!hexOccupiedByThisPlayer) {
 				System.out.println("Vous n'occupez pas le hex choisi. Veuillez choisir un hex que vous occupez.");
@@ -277,53 +277,73 @@ public class Player {
 				hexDeparture=Board.determineHexFromCoordinates(xDeparture, yDeparture);
 				hexOccupiedByThisPlayer=Helper.TestOccupationPlayerHex(hexDeparture, this);
 			}
+			//Le joueur choisit le hex où il veut aller
+			//Deux cas d'erreurs possibles: soit le hex est occupé, soit il est trop éloigné
     		while(response) { 
     			System.out.println("Choisissez le hex où vous souhaitez aller");
     			System.out.println("Entrez le x du hex choisi.");
         		int xDestination=scanner.nextInt();
         		System.out.println("Entrez le y du hex choisi");
         		int yDestination=scanner.nextInt();
-    			Hex hexDestination=Board.determineHexFromCoordinates(xDeparture, yDeparture);
-    			boolean hexOccupied=Helper.TestOccupationHex(hexDestination);
-    			while(hexOccupied==true) {
+    			Hex hexDestination=Board.determineHexFromCoordinates(xDestination, yDestination);
+    			boolean hexOccupied=Helper.TestOccupationHex(hexDestination); //tester si le hex est occupé
+    			boolean hexIsNeighbour=Helper.CheckNeighboursHex(xDeparture,yDeparture,xDestination,yDestination); //tester si le hex est eloigné
+    			System.out.println(hexIsNeighbour);
+    			//regler le cas du hex occupé
+    			while(hexOccupied) {
     				System.out.println("Le hex que vous avez choisi est occupé par un autre joueur. Choisissez un autre hex.");
     				System.out.println("Entrez le x du hex choisi.");
     	    		xDestination=scanner.nextInt();
     	    		System.out.println("Entrez le y du hex choisi");
     	    		yDestination=scanner.nextInt();
-    				hexDestination=Board.determineHexFromCoordinates(xDeparture, yDeparture);
+    				hexDestination=Board.determineHexFromCoordinates(xDestination, yDestination);
         			hexOccupied=Helper.TestOccupationHex(hexDestination);
     			}
+    			
+    			//regler le cas du hex eloigné
+    			while(!hexIsNeighbour) {
+    				System.out.println("Le hex que vous avez choisi est trop éloigné. Choisissez un hex voisin.");
+    				System.out.println("Entrez le x du hex choisi.");
+    	    		xDestination=scanner.nextInt();
+    	    		System.out.println("Entrez le y du hex choisi");
+    	    		yDestination=scanner.nextInt();
+    				hexDestination=Board.determineHexFromCoordinates(xDestination, yDestination);
+    				hexIsNeighbour=Helper.CheckNeighboursHex(xDeparture,yDeparture,xDestination,yDestination);
+    			}
+    			
+    			//Le joueur choisit le nombre de vaisseaux qu'il veut déplacer
     			int nbShipsOnHex=hexDeparture.getShipsOnHex().size(); 
     			//Faire un String toString pour renvoyer le nb de vaisseaux disponibles sur cet Hex et que le joueur peut bouger
     			System.out.println("Choisissez le nombre de vaisseaux que vous souhaitez déplacer");
     			int nbShipsToMove=scanner.nextInt(); 
-    			if (nbShipsToMove>nbShipsOnHex) {
+    			
+    			//regler le cas d'un nombre de vaisseau trop grand
+    			while (nbShipsToMove>nbShipsOnHex) {
     				System.out.println("Impossible de prendre plus de vaisseaux qu'il n'y en a. Choisissez un nombre plus petit.");
-    			}else if(nbShipsToMove<0) {
-    				System.out.println("Impossible de ne prendre aucun vaisseau. Choisissez un chiffre supérieur à 0.");
-    			}else {
-    				int xHexDeparture=hexDeparture.getxPosition();
-    				int yHexDeparture=hexDeparture.getyPosition();
-    				int xHexDestination=hexDestination.getxPosition();
-    				int yHexDestination=hexDestination.getyPosition();
-    				boolean hexIsNeighbour=Helper.CheckNeighboursHex(xHexDeparture,yHexDeparture,xHexDestination,yHexDestination);
-    				if(hexIsNeighbour==false) {
-    					System.out.println("Le hex de destination choisi est trop éloigné. Veuillez choisir un hex voisin");
-    				}else {
-    					//Bouge la fleet du joueur à l'hex de destination
-    					hexDeparture=hexDestination;
-    				}
+    				System.out.println("Choisissez le nombre de vaisseaux que vous souhaitez déplacer");
+        			nbShipsToMove=scanner.nextInt(); 
     			}
+    			
+    			//regler le cas de valaurs aberrantes
+    			while(nbShipsToMove<0) {
+    				System.out.println("Impossible de ne prendre aucun vaisseau. Choisissez un chiffre supérieur à 0.");
+    				System.out.println("Choisissez le nombre de vaisseaux que vous souhaitez déplacer");
+        			nbShipsToMove=scanner.nextInt(); 
+    			}
+    			
+    			//Bouge la fleet du joueur à l'hex de destination
+    			hexDeparture=hexDestination;
+    			
+    			//Demande au joueur si il souhaite bouger cette même fleet un seconde fois
     			nbMovement+=1;
     			if((nbMovement<2)&&(hexDeparture.isTriPrime()!=true)) {
     				System.out.println("Souhaitez-vous bouger de nouveau votre flotte ? Entrez 'oui' ou 'non'.");
     				String answer=scanner.nextLine();
-    				while(answer!="oui"||answer!="non") {
+    				while (!answer.equals("oui") && !answer.equals("non")) {
     					System.out.println("Souhaitez-vous bouger de nouveau votre flotte ? Entrez 'oui' ou 'non'.");
         				answer=scanner.nextLine();
     				}
-        			if(answer=="non") {
+        			if(answer.equals("non")) {
         				nbMovement=0;
         				response=false;
         				hexDeparture.setControlledBy(this); 

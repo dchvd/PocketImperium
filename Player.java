@@ -338,6 +338,8 @@ public class Player {
     				System.out.println("Vous avez pris contrôle du système!");
     			}
     		}
+    		//Résumer les informations du joueur
+			System.out.println(this.toString());
     	}
     	
     }
@@ -391,6 +393,9 @@ public class Player {
     		}
     		//Détermine le gagnant
     		System.out.println(Exterminate.DetermineWinner(nbShipsAttacker, nbShipsDefendant, systemToInvade, this));
+    		
+    		//Résumer les informations du joueur
+			System.out.println(this.toString());
     	}
     	
     }

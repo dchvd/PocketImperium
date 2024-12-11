@@ -1,6 +1,4 @@
-
 package pocket_imperium;
-
 import java.util.List;
 import java.util.Scanner;
 import java.util.ArrayList;
@@ -18,43 +16,23 @@ public class Player {
     private ArrayList<Hex> controlledHexs;
     
     
-    public Player() {
-    	Scanner sc = new Scanner(System.in);
-    	
-    	// Demande si le joueur est virtuel
-    	while (true) {
-    		System.out.println("Le joueur est-il humain? Entrez oui ou non : ");
-        	String estVirtuel = sc.nextLine();
-    		if (estVirtuel.equals("oui")) {
-    			System.out.print("    Entrez votre surnom : ");
-    	    	this.name = sc.nextLine();
-    	       	System.out.println("Bienvenue " + this.name);
-    	       	break;
-    		}else if (estVirtuel.equals("non")) {
-    			// Demander le surnom
-    	    	System.out.println("    Entrez le surnom du joueur virtuel : ");
-    	    	this.name = sc.nextLine();
-    	    	System.out.println(" Assignation d'une stratégie secrète au joueur virtuel...");
-    	    	Random randomNumbers = new Random();
-    	    	int numStrategie = randomNumbers.nextInt(6);
-    	    	//GameStrategy randomStrategy= GameStrategy ;
-    	    	//this.strategy = randomStrategy;
-    	    	break;
-    		}else {
-    			System.out.println("Mauvaise saisie, veuillez recommencer");
-    		}
-    	}        
-        this.ships = new ArrayList<>();
-  }
-    
     public ArrayList<Hex> getControlledHexs() {
-		  return controlledHexs;
+		return controlledHexs;
 	}
 
 	public void setControlledHexs(ArrayList<Hex> controlledHexs) {
 		this.controlledHexs = controlledHexs;
 	}
 
+	public Player(String name, boolean isVirtual) { //, GameStrategy strategy, Color couleur
+        this.name = name;
+        this.isVirtual = isVirtual;
+        //this.strategy = strategy;
+        this.commands = new ArrayList<>();
+        this.ships = new ArrayList<>();
+        this.controlledHexs=new ArrayList<>();
+        //this.couleur=couleur;
+    }
     
     public SectorCard chooseSector(Board plat) {
     	System.out.print(this.name);
@@ -215,7 +193,7 @@ public class Player {
 			int x=scanner.nextInt(); 
 			System.out.println("Entrez le y du hex choisi.");
 			int y=scanner.nextInt();
-			Hex choosedHex=Board.determineHexFromCoordinates(x, y);
+			Hex choosedHex=Board.gameBoard.get(x).get(y);
 			boolean hexOccupiedByThisPlayer=Helper.TestOccupationPlayerHex(choosedHex, this);
 			while(hexOccupiedByThisPlayer==false) {
 				choosedHex=null;
@@ -252,21 +230,26 @@ public class Player {
      * Elle verifie egalement que le joueur deplace sa flotte sur un hex voisin, et pas sur un hex trop eloigne. 
      * @param effectivness determine le nombre de flottes que le joueur peut bouger. Elle est definie en fonction du nombre de joueurs ayant choisi la meme commande
      */
+    
+    //problemes actuels avec Explore:
+    // n'ajoute pas de vaisseau à la liste des vaisseaux du hex occupé
+    //determine TRES MAL les voisins
     public void Explore(int effectivness) {
     	System.out.println("EXPLORE");
     	for(int i=0;i<effectivness;i++) {
+    		System.out.println("i="+i);
     		boolean response=true;
     		int nbMovement=0; 
     		Scanner scanner = new Scanner(System.in);
     		System.out.println("Choisissez un hex d'où vous voulez partir");
-    		//Afficher la liste des hex controllés par le joueur
+    		//A FAIRE -> Afficher la liste des hex controllés par le joueur
     		System.out.println("Entrez le x du hex choisi.");
     		int xDeparture=scanner.nextInt();
     		System.out.println("Entrez le y du hex choisi");
     		int yDeparture=scanner.nextInt();
-			Hex hexDeparture=Board.determineHexFromCoordinates(xDeparture, yDeparture);
+			Hex hexDeparture=Board.gameBoard.get(xDeparture).get(yDeparture);
 			
-			//Le joueur choisit le hex duquel il veut partir
+			//Le joueur choisit le hex duquel il veut partir GOOD
 			boolean hexOccupiedByThisPlayer=Helper.TestOccupationPlayerHex(hexDeparture, this);
 			while(!hexOccupiedByThisPlayer) {
 				System.out.println("Vous n'occupez pas le hex choisi. Veuillez choisir un hex que vous occupez.");
@@ -277,7 +260,7 @@ public class Player {
 				hexDeparture=Board.determineHexFromCoordinates(xDeparture, yDeparture);
 				hexOccupiedByThisPlayer=Helper.TestOccupationPlayerHex(hexDeparture, this);
 			}
-			//Le joueur choisit le hex où il veut aller
+			//Le joueur choisit le hex où il veut aller GOOD
 			//Deux cas d'erreurs possibles: soit le hex est occupé, soit il est trop éloigné
     		while(response) { 
     			System.out.println("Choisissez le hex où vous souhaitez aller");
@@ -289,7 +272,7 @@ public class Player {
     			boolean hexOccupied=Helper.TestOccupationHex(hexDestination); //tester si le hex est occupé
     			boolean hexIsNeighbour=Helper.CheckNeighboursHex(xDeparture,yDeparture,xDestination,yDestination); //tester si le hex est eloigné
     			System.out.println(hexIsNeighbour);
-    			//regler le cas du hex occupé
+    			//regler le cas du hex occupé GOOD
     			while(hexOccupied) {
     				System.out.println("Le hex que vous avez choisi est occupé par un autre joueur. Choisissez un autre hex.");
     				System.out.println("Entrez le x du hex choisi.");
@@ -311,32 +294,32 @@ public class Player {
     				hexIsNeighbour=Helper.CheckNeighboursHex(xDeparture,yDeparture,xDestination,yDestination);
     			}
     			
-    			//Le joueur choisit le nombre de vaisseaux qu'il veut déplacer
+    			//Le joueur choisit le nombre de vaisseaux qu'il veut déplacer GOOD
     			int nbShipsOnHex=hexDeparture.getShipsOnHex().size(); 
     			//Faire un String toString pour renvoyer le nb de vaisseaux disponibles sur cet Hex et que le joueur peut bouger
     			System.out.println("Choisissez le nombre de vaisseaux que vous souhaitez déplacer");
     			int nbShipsToMove=scanner.nextInt(); 
     			
-    			//regler le cas d'un nombre de vaisseau trop grand
+    			//regler le cas d'un nombre de vaisseau trop grand GOOD
     			while (nbShipsToMove>nbShipsOnHex) {
     				System.out.println("Impossible de prendre plus de vaisseaux qu'il n'y en a. Choisissez un nombre plus petit.");
     				System.out.println("Choisissez le nombre de vaisseaux que vous souhaitez déplacer");
         			nbShipsToMove=scanner.nextInt(); 
     			}
     			
-    			//regler le cas de valaurs aberrantes
+    			//regler le cas de valeurs aberrantes GOOD
     			while(nbShipsToMove<0) {
     				System.out.println("Impossible de ne prendre aucun vaisseau. Choisissez un chiffre supérieur à 0.");
     				System.out.println("Choisissez le nombre de vaisseaux que vous souhaitez déplacer");
         			nbShipsToMove=scanner.nextInt(); 
     			}
-    			
-    			//Bouge la fleet du joueur à l'hex de destination
+    			//A FAIRE -> ajouter les vaisseaux au hex
+    			//Bouge la fleet du joueur à l'hex de destination GOOD
     			hexDeparture=hexDestination;
-    			
     			//Demande au joueur si il souhaite bouger cette même fleet un seconde fois
     			nbMovement+=1;
-    			if((nbMovement<2)&&(hexDeparture.isTriPrime()!=true)) {
+    			//Donner la possibilité de bouger sa flotte une seconde fois
+    			if((nbMovement<2)&&(!hexDeparture.isTriPrime())) {
     				System.out.println("Souhaitez-vous bouger de nouveau votre flotte ? Entrez 'oui' ou 'non'.");
     				String answer=scanner.nextLine();
     				while (!answer.equals("oui") && !answer.equals("non")) {
@@ -374,7 +357,7 @@ public class Player {
         		int xInvadeFrom=scanner.nextInt();
         		System.out.println("Entrez le y du systeme choisi");
         		int yInvadeFrom=scanner.nextInt();
-    			Hex systemToInvadeFrom=Board.determineHexFromCoordinates(xInvadeFrom, yInvadeFrom);
+    			Hex systemToInvadeFrom=Board.gameBoard.get(xInvadeFrom).get(yInvadeFrom);
     			systemsToInvadeFrom.add(systemToInvadeFrom); 
     			System.out.println("Choisissez le nombre de vaisseaux que vous souhaitez utiliser dans l'attaque.");
     			nbShipsAttacker=scanner.nextInt();
@@ -442,6 +425,11 @@ public class Player {
     	player1.getControlledHexs().get(0).getShipsOnHex().add(ship1);
     	player1.getControlledHexs().get(1).getShipsOnHex().add(ship2);
     	
+    	//controles
+    	System.out.println(player1.getControlledHexs().get(0).isTriPrime());
+    	System.out.println(player1.getControlledHexs().get(1).isTriPrime());
+    	
+    	
     	//Initialiser un second joueur
     	//Hexs controlles
     	Player player2=new Player("anaelle",false);
@@ -455,13 +443,17 @@ public class Player {
     	player2.getControlledHexs().get(0).getShipsOnHex().add(ship3);
     	player2.getControlledHexs().get(1).getShipsOnHex().add(ship4);
     	
+    	//controles
+    	System.out.println(player2.getControlledHexs().get(0).isTriPrime());
+    	System.out.println(player2.getControlledHexs().get(1).isTriPrime());
+    	
     	//Test des commandes
-    	player1.plan();
-    	player1.Expand(3);
+    	//player1.plan();
+    	//player1.Expand(3);
     	player1.Explore(2);
     	player1.Exterminate(1);
     }
-
+    
     
 }
 

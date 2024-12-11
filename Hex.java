@@ -9,7 +9,7 @@ import java.util.List;
 public class Hex {
 	private int xPosition;
 	private int yPosition;
-	private ArrayList<Ship> shipsOnHex;
+	private ArrayList<Ship> shipsOnHex = new ArrayList<Ship>();
 	private int value;
 	private int nbMaxShips;
 	private boolean triPrime, systemHex1, systemHex2;

@@ -100,9 +100,9 @@ public class Helper {
     public static void GainControllHex(Hex hex, int nbShips,Player player) {
     	hex.setControlled(true);
     	hex.setControlledBy(player);
-    	ArrayList<Ship> newShipsOnHex=hex.getShipsOnHex();
+    	ArrayList<Ship> newShipsOnHex=hex.getShipsOnHex();//mauvais endroit je crois
     	for(int i=0;i<nbShips;i++) {
-    		Ship newShip= new Ship(player); //qu'est-ce qu'on fait avec la couleur ducoup ? 
+    		Ship newShip= new Ship(player, 0); //qu'est-ce qu'on fait avec la couleur ducoup ? 
     		newShipsOnHex.add(newShip);
     	}
     	hex.setShipsOnHex(newShipsOnHex);
@@ -157,69 +157,5 @@ public class Helper {
 			newShipsOnHex.remove(i);
 		}
 		hex.setShipsOnHex(newShipsOnHex);
-	}
-	public void setCoordinates(int x, int y) {
-	 this.xPosition = x; 
-		 this.yPosition = y;
-
-		 }
-
-	public int getxPosition() {
-		return xPosition;
-	}
-
-
-
-	public void setxPosition(int xPosition) {
-		this.xPosition = xPosition;
-	}
-
-
-
-	public int getyPosition() {
-		return yPosition;
-	}
-
-
-
-	public void setyPosition(int yPosition) {
-		this.yPosition = yPosition;
-	}
-
-
-	public ArrayList<Ship> getShipsOnHex() {
-		return shipsOnHex;
-	}
-
-	public void setShipsOnHex(ArrayList<Ship> shipsOnHex) {
-		this.shipsOnHex = shipsOnHex;
-	}
-
-	public int getValue() {
-		return value;
-	}
-
-	public void setValue(int value) {
-		this.value = value;
-	}
-
-	public int getNbMaxShips() {
-		return nbMaxShips;
-	}
-
-	public void setNbMaxShips(int nbMaxShips) {
-		this.nbMaxShips = nbMaxShips;
-	}
-
-	public boolean isTriPrime() {
-		return triPrime;
-	}
-
-	public boolean isSystemHex1() {
-		return systemHex1;
-	}
-
-	public boolean isSystemHex2() {
-		return systemHex2;
 	}
 }

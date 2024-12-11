@@ -202,7 +202,7 @@ public class Player {
 				x=scanner.nextInt(); 
 				System.out.println("Entrez le y du hex choisi.");
 				y=scanner.nextInt();
-				choosedHex=Board.determineHexFromCoordinates(x, y);
+				choosedHex=Board.gameBoard.get(x).get(y);
 				hexOccupiedByThisPlayer=Helper.TestOccupationPlayerHex(choosedHex, this);
 			}
 			choosedHex.getShipsOnHex().add(new Ship(this, (int) Math.random()));
@@ -217,7 +217,7 @@ public class Player {
 				x=scanner.nextInt(); 
 				System.out.println("Entrez le y du hex choisi.");
 				y=scanner.nextInt();
-				choosedHex=Board.determineHexFromCoordinates(x, y);
+				choosedHex=Board.gameBoard.get(x).get(y);
 				hexOccupiedByThisPlayer=Helper.TestOccupationPlayerHex(choosedHex, this);
 			}
 				//append choosedHex.getShipsOnHex() avec choosedHex
@@ -257,7 +257,7 @@ public class Player {
 	    		xDeparture=scanner.nextInt();
 	    		System.out.println("Entrez le y du hex choisi");
 	    		yDeparture=scanner.nextInt();
-				hexDeparture=Board.determineHexFromCoordinates(xDeparture, yDeparture);
+				hexDeparture=Board.gameBoard.get(xDeparture).get(yDeparture);
 				hexOccupiedByThisPlayer=Helper.TestOccupationPlayerHex(hexDeparture, this);
 			}
 			//Le joueur choisit le hex où il veut aller GOOD
@@ -268,7 +268,7 @@ public class Player {
         		int xDestination=scanner.nextInt();
         		System.out.println("Entrez le y du hex choisi");
         		int yDestination=scanner.nextInt();
-    			Hex hexDestination=Board.determineHexFromCoordinates(xDestination, yDestination);
+    			Hex hexDestination=Board.gameBoard.get(xDestination).get(yDestination);
     			boolean hexOccupied=Helper.TestOccupationHex(hexDestination); //tester si le hex est occupé
     			boolean hexIsNeighbour=Helper.CheckNeighboursHex(xDeparture,yDeparture,xDestination,yDestination); //tester si le hex est eloigné
     			System.out.println(hexIsNeighbour);
@@ -279,7 +279,7 @@ public class Player {
     	    		xDestination=scanner.nextInt();
     	    		System.out.println("Entrez le y du hex choisi");
     	    		yDestination=scanner.nextInt();
-    				hexDestination=Board.determineHexFromCoordinates(xDestination, yDestination);
+    				hexDestination=Board.gameBoard.get(xDestination).get(yDestination);
         			hexOccupied=Helper.TestOccupationHex(hexDestination);
     			}
     			
@@ -290,7 +290,7 @@ public class Player {
     	    		xDestination=scanner.nextInt();
     	    		System.out.println("Entrez le y du hex choisi");
     	    		yDestination=scanner.nextInt();
-    				hexDestination=Board.determineHexFromCoordinates(xDestination, yDestination);
+    				hexDestination=Board.gameBoard.get(xDestination).get(yDestination);
     				hexIsNeighbour=Helper.CheckNeighboursHex(xDeparture,yDeparture,xDestination,yDestination);
     			}
     			
@@ -381,7 +381,7 @@ public class Player {
     		int xInvade=scanner.nextInt();
     		System.out.println("Entrez le y du hex choisi");
     		int yInvade=scanner.nextInt();
-			Hex systemToInvade=Board.determineHexFromCoordinates(xInvade, yInvade);
+			Hex systemToInvade=Board.gameBoard.get(xInvade).get(yInvade);
 			int nbShipsDefendant=systemToInvade.getShipsOnHex().size();
     		//Construit l'action
     		for (int j=0;j<systemsToInvadeFrom.size();j++) {

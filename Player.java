@@ -241,7 +241,7 @@ public class Player {
     		int nbMovement=0; 
     		Scanner scanner = new Scanner(System.in);
     		System.out.println("Choisissez un hex d'où vous voulez partir");
-    		//A FAIRE -> Afficher la liste des hex controllés par le joueur
+    		System.out.println(this.toString());
     		System.out.println("Entrez le x du hex choisi.");
     		int xDeparture=scanner.nextInt();
     		System.out.println("Entrez le y du hex choisi");
@@ -293,34 +293,32 @@ public class Player {
     				hexIsNeighbour=Helper.CheckNeighboursHex(xDeparture,yDeparture,xDestination,yDestination);
     			}
     			
-    			//Le joueur choisit le nombre de vaisseaux qu'il veut déplacer GOOD
+    			//Le joueur choisit le nombre de vaisseaux qu'il veut déplacer 
     			int nbShipsOnHex=hexDeparture.getShipsOnHex().size(); 
     			//Faire un String toString pour renvoyer le nb de vaisseaux disponibles sur cet Hex et que le joueur peut bouger
     			System.out.println("Choisissez le nombre de vaisseaux que vous souhaitez déplacer");
     			int nbShipsToMove=scanner.nextInt(); 
     			
-    			//regler le cas d'un nombre de vaisseau trop grand GOOD
+    			//regler le cas d'un nombre de vaisseau trop grand 
     			while (nbShipsToMove>nbShipsOnHex) {
     				System.out.println("Impossible de prendre plus de vaisseaux qu'il n'y en a. Choisissez un nombre plus petit.");
     				System.out.println("Choisissez le nombre de vaisseaux que vous souhaitez déplacer");
         			nbShipsToMove=scanner.nextInt(); 
     			}
     			
-    			//regler le cas de valeurs aberrantes GOOD
-    			while(nbShipsToMove<0) {
+    			//regler le cas de valeurs aberrantes 
+    			while(nbShipsToMove<=0) {
     				System.out.println("Impossible de ne prendre aucun vaisseau. Choisissez un chiffre supérieur à 0.");
     				System.out.println("Choisissez le nombre de vaisseaux que vous souhaitez déplacer");
         			nbShipsToMove=scanner.nextInt(); 
     			}
     			//A FAIRE -> ajouter les vaisseaux au hex
-    			//Bouge la fleet du joueur à l'hex de destination GOOD
-    			hexDeparture=hexDestination;
+    			
     			//Demande au joueur si il souhaite bouger cette même fleet un seconde fois
     			nbMovement+=1;
     			//Donner la possibilité de bouger sa flotte une seconde fois
-    			if((nbMovement<2)&&(!hexDeparture.isTriPrime())) {
-    				System.out.println("Souhaitez-vous bouger de nouveau votre flotte ? Entrez 'oui' ou 'non'.");
-    				String answer=scanner.nextLine();
+    			if((nbMovement<2)&&(!hexDestination.isTriPrime())) {
+    				String answer="random";
     				while (!answer.equals("oui") && !answer.equals("non")) {
     					System.out.println("Souhaitez-vous bouger de nouveau votre flotte ? Entrez 'oui' ou 'non'.");
         				answer=scanner.nextLine();
@@ -328,14 +326,26 @@ public class Player {
         			if(answer.equals("non")) {
         				nbMovement=0;
         				response=false;
-        				hexDeparture.setControlledBy(this); 
+        				//Bouge le vaisseau sur le nouveau Hex
+        				hexDestination.setControlledBy(this); 
+        				hexDestination.getShipsOnHex().add(hexDeparture.getShipsOnHex().getFirst());
+        				this.controlledHexs.add(hexDestination);
+        				
+        				//Supprime le vaisseau de l'ancien hex
+        				hexDeparture.getShipsOnHex().removeFirst();
         				System.out.println("Vous avez pris contrôle du sytème!");
         			}
     			}else {
     				nbMovement=0;
     				response=false;
-    				hexDeparture.setControlledBy(this);
-    				System.out.println("Vous avez pris contrôle du système!");
+    				//Bouge le vaisseau sur le nouveau Hex
+    				hexDestination.setControlledBy(this); 
+    				hexDestination.getShipsOnHex().add(this.ships.getFirst());
+    				this.controlledHexs.add(hexDestination);
+    				
+    				//Supprime le vaisseau de l'ancien hex
+    				hexDeparture.getShipsOnHex().removeFirst();
+    				System.out.println("Vous avez pris contrôle du sytème!");
     			}
     		}
     		//Résumer les informations du joueur
@@ -461,7 +471,7 @@ public class Player {
     	
     	//Test des commandes
     	//player1.plan();
-    	player1.Expand(3);
+    	//player1.Expand(3);
     	player1.Explore(2);
     	player1.Exterminate(1);
     }

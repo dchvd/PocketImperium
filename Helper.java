@@ -118,20 +118,20 @@ public class Helper {
      * @return true si le hex est bien voisin, false sinon
      */
 	public static boolean CheckNeighboursHex(int xHexDeparture, int yHexDeparture, int xHexDestination, int yHexDestination) {
-		if((xHexDestination<=xHexDeparture+1)||(xHexDestination>=xHexDeparture-1)){
-			if((yHexDestination<=yHexDeparture+1)||(yHexDestination>=yHexDeparture-1)) {
+		if((xHexDestination<=xHexDeparture+1)&&(xHexDestination>=xHexDeparture-1)){
+			if((yHexDestination<=yHexDeparture+1)&&(yHexDestination>=yHexDeparture-1)) {
 				if(xHexDeparture%2==0) {
-					if((xHexDestination==xHexDeparture-1)||(yHexDestination==yHexDeparture-1)) {
+					if((xHexDestination==xHexDeparture-1)&&(yHexDestination==yHexDeparture+1)) {
 						return false;
-					}else if((xHexDestination==xHexDeparture+1)||(yHexDestination==yHexDeparture)) {
+					}else if((xHexDestination==xHexDeparture+1)&&(yHexDestination==yHexDeparture+1)) {
 						return false;
 					}else {
 						return true;
 					}
 				}else{
-					if((xHexDestination==xHexDeparture-1)||(yHexDestination==yHexDeparture+1)) {
+					if((xHexDestination==xHexDeparture-1)&&(yHexDestination==yHexDeparture-1)) {
 						return false;
-					}else if((xHexDestination==xHexDeparture+1)||(yHexDestination==yHexDeparture+1)) {
+					}else if((xHexDestination==xHexDeparture+1)&&(yHexDestination==yHexDeparture-1)) {
 						return false;
 					}else {
 						return true;

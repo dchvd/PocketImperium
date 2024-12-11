@@ -132,12 +132,7 @@ public class Board {
     public void printBoard() {
     	System.out.println("Plateau :");
         for (int i = 0; i < this.gameBoard.size(); i++) {
-            System.out.println(i);
-            for (int j = 0; j < this.gameBoard.get(i).size(); j++) {
-            	 System.out.println(j);
-            	 System.out.println(this.gameBoard.get(i).get(j));
-               
-            }
+        	System.out.println(this.gameBoard.get(i));
         }
     }
     
@@ -160,11 +155,12 @@ public class Board {
     public List<List<Hex>> getGameBoard(){
     	return this.gameBoard;
     }
-	public static Hex determineHexFromCoordinates(int x, int y) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	public boolean verifyCapacibility(Hex choosedHex) {
+	
+	public boolean verifyCapability(Hex choosedHex) {
+		if (choosedHex.isSystemHex1()==false) {
+			System.out.println("Ce hex ne contient pas de système de niveau 1");
+			return false;
+		}
 		for (SectorCard[] rangee: this.board) {
 			for (SectorCard card : rangee) {
 		        if (card.getHexes().contains(choosedHex)) {

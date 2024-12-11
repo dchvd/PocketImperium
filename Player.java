@@ -229,12 +229,10 @@ public class Player {
      * Elle verifie egalement que le joueur deplace sa flotte sur un hex voisin, et pas sur un hex trop eloigne. 
      * @param effectivness determine le nombre de flottes que le joueur peut bouger. Elle est definie en fonction du nombre de joueurs ayant choisi la meme commande
      */
-    
-    //problemes actuels avec Explore:
-    // n'ajoute pas de vaisseau à la liste des vaisseaux du hex occupé
-    //determine TRES MAL les voisins
+  
     public void Explore(int effectivness) {
     	System.out.println("EXPLORE");
+    	ArrayList<Integer> shipsIds=new ArrayList<Integer>();
     	for(int i=0;i<effectivness;i++) {
     		System.out.println("i="+i);
     		boolean response=true;
@@ -330,6 +328,9 @@ public class Player {
         				hexDestination.setControlledBy(this); 
         				hexDestination.getShipsOnHex().add(hexDeparture.getShipsOnHex().getFirst());
         				this.controlledHexs.add(hexDestination);
+        				
+        				//Enregistre le vaisseau bougé dans la liste des vaisseaux qui ne peuvent plus être réutilisés
+        				
         				
         				//Supprime le vaisseau de l'ancien hex
         				hexDeparture.getShipsOnHex().removeFirst();

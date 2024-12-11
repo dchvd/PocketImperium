@@ -454,8 +454,10 @@ public class Player {
     //public boolean isWinner() {
     	
     //}
-    
+	// A ENLEVER (inutilisable en partie)
+    /*
     public static void main(String[] args) {
+	    
     	//Generer le plateau
     	Board board = new Board();
     	
@@ -500,7 +502,7 @@ public class Player {
     	player1.Explore(2);
     	player1.Exterminate(1);
     }
-    
+    */
     
 }
 

@@ -216,7 +216,10 @@ public class Player {
 			int nbShipsTotal = choosedHex.getShipsOnHex().size();
 			System.out.println("Votre vaisseau a bien été ajouté!");
 			System.out.println("Nombre de vaisseaux sur le hex: " + nbShipsTotal);
-				//this.toString();
+			
+			//Résumer les informations du joueur
+			System.out.println(this.toString());
+			System.out.println("Note: si le hex que vous controllez possède plus de vaisseaux que ce qu'il peut accueillir, des vaisseaux seront supprimé à la fin de ce tour.");
 		
     	}
 	}
@@ -400,12 +403,13 @@ public class Player {
     	return ships.isEmpty();
     }
     
+   
     public String toString() {
-    	return "Etat actuel de "+this.name
-    			+ "\n Hex occupés: "+this.controlledHexs
-    			+"\n Nombre de vaisseaux: "+this.ships
-    			+"\n Controle le Tri Prime: "+ this.controllsTriPrime;
+        return "État actuel de " + this.name + ":\n"
+            + "- Hexs contrôlés: " + this.controlledHexs + "\n"
+            + "- Contrôle le Tri Prime: " + this.controllsTriPrime;
     }
+
     
     //public boolean isWinner() {
     	

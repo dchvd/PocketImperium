@@ -28,47 +28,59 @@ public class Partie {
     
     /**
      * Le constructeur Partie permet de créer une partie du jeu Imperium Pocket
+     * @param sc 
      * @param players est la liste des joueurs qui s'affronteront durant la partie
      */
-    public Partie() {
+    public Partie(Scanner sc) {
     	System.out.println(" --- Création des joueurs ! --- \n Chaque joueur doit choisir un surnom. \n");
     	System.out.println(" Joueur n°1 :");
-    	this.players.add(new Player());
+    	this.players.add(new Player(sc));
     	System.out.println("\n Joueur n°2 :");
-    	this.players.add(new Player());
+    	this.players.add(new Player(sc));
     	System.out.println("\n Joueur n°3 :");
-    	this.players.add(new Player());
-    	this.startGame();
+    	this.players.add(new Player(sc));
+    	this.startGame(sc);
     }
     
     /**
      * La fonction startGame permet de lancer la partie
      */
-    public void startGame() {
-    	this.initialisation();
+    public void startGame(Scanner sc) {
+    	System.out.println("------ Initialisation ! ------");
+    	this.initialisation(sc);
+    	System.out.println("------ Tour suivant ! ------");
+    	sc.nextLine();
+    	//this.Tour(sc);
+    	//this.tour++;
+    	/*
         while (!finPartie()) {
-            Tour();
-            tour++;
-        }
-        declareWinner();
+        	System.out.println("------ Tour suivant ! ------");
+            this.Tour();
+            this.tour++;
+        }*/
+        //declareWinner();
     }
     
-    private void initialisation() {
-    	Scanner sc = new Scanner(System.in);
-    	System.out.println(" --- Début de la partie ! --- \n Chaque joueur doit positionner deux bateaux sur un système de niveau 1. \n"
-    			+ "Chaque joueur doit être seul sur son secteur : vous ne pouvez pas placer des bateaux sur un secteur déjà occupé");
-    	for (Player player : players) {
+    private void initialisation(Scanner sc) {
+    	System.out.println("\n --- Début de la partie ! --- \n Chaque joueur doit positionner deux bateaux sur un système de niveau 1. \n"
+    			+ " Chaque joueur doit être seul sur son secteur : vous ne pouvez pas placer des bateaux sur un secteur déjà occupé");
+    	for (Player player : this.players) {
+    		this.gameBoard.printBoard();
     		while(true) {
     			System.out.println(player.getName()+ " : choisissez le système à habiter"
-    					+ "\n donnez le x du Hex choisi ");
+    					+ "\n Entrez le x du Hex choisi ");
     	    	int x = sc.nextInt();
     	    	System.out.println("Entrez le y du hex choisi.");
 				int y=sc.nextInt();
-				Hex choosedHex=this.gameBoard.determineHexFromCoordinates(x, y); // pourquoi elle est statique
-				if(this.gameBoard.verifyCapacibility(choosedHex)) {
+				Hex choosedHex=this.gameBoard.gameBoard.get(x).get(y); // pourquoi elle est statique
+				if(this.gameBoard.verifyCapability(choosedHex)) {
 	            	System.out.println("Secteur valide");
-	            	choosedHex.isControlled = true;
-	            	choosedHex.isControlledBy(player);
+	            	choosedHex.setControlled(true);
+	            	choosedHex.setControlledBy(player);
+	            	ArrayList<Ship> shipsOnHex = new ArrayList<Ship>();
+	            	shipsOnHex.add(player.getShips().get(0));
+	            	shipsOnHex.add(player.getShips().get(1));
+	            	choosedHex.setShipsOnHex(shipsOnHex);
 	            	break;
 
 				}else {
@@ -77,6 +89,39 @@ public class Partie {
 				
     		}
     	}
+    	System.out.println("\n --- Chaque joueur doit désormais re placer deux bateaux sur un système de niveau 1. \n"
+    			+ " Vous ne pouvez pas placer des bateaux sur un secteur déjà occupé");
+    	
+    	List<Player> invertedPlayerList = new ArrayList<Player>();
+    	invertedPlayerList = players.reversed();
+    	
+    	for (Player player : invertedPlayerList) {
+    		this.gameBoard.printBoard();
+    		while(true) {
+    			System.out.println(player.getName()+ " : choisissez le système à habiter"
+    					+ "\n Entrez le x du Hex choisi ");
+    	    	int x = sc.nextInt();
+    	    	System.out.println("Entrez le y du hex choisi.");
+				int y=sc.nextInt();
+				Hex choosedHex=this.gameBoard.gameBoard.get(x).get(y); // pourquoi elle est statique
+				if(this.gameBoard.verifyCapability(choosedHex)) {
+	            	System.out.println("Secteur valide");
+	            	choosedHex.setControlled(true);
+	            	choosedHex.setControlledBy(player);
+	            	ArrayList<Ship> shipsOnHex = new ArrayList<Ship>();
+	            	shipsOnHex.add(player.getShips().get(0));
+	            	shipsOnHex.add(player.getShips().get(1));
+	            	choosedHex.setShipsOnHex(shipsOnHex);
+	            	break;
+
+				}else {
+					System.out.println("Secteur déjà occupé: veuillez en choisir un autre.");
+				}
+				
+    		}
+    	}
+    	System.out.println("Fin de l'initialisation de la partie");
+    	return;
 	}
     
     /**

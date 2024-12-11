@@ -24,14 +24,38 @@ public class Player {
 		this.controlledHexs = controlledHexs;
 	}
 
-	public Player(String name, boolean isVirtual) { //, GameStrategy strategy, Color couleur
-        this.name = name;
-        this.isVirtual = isVirtual;
-        //this.strategy = strategy;
-        this.commands = new ArrayList<>();
+	public Player(Scanner sc) {   	
+    	// Demande si le joueur est virtuel
+    	while (true) {
+    		System.out.println("Le joueur est-il humain? Entrez oui ou non : ");
+        	String estVirtuel = sc.nextLine();
+    		if (estVirtuel.equals("oui")) {
+    			System.out.print("    Entrez votre surnom : ");
+    	    	this.name = sc.nextLine();
+    	    	System.out.print("    Entrez la couleur que vous souhaitez (j pour jaune...) : "); // finir
+    	    	//char col = sc.nextChar(); // Voir comment faire ça (plus simple de faire avec des entrées de chiffres?) 
+    	    	// Rajouter des try catch partout du coup
+    	    	//this.couleur=couleur;
+    	       	System.out.println("\n Bienvenue " + this.name);
+    	       	break;
+    		}else if (estVirtuel.equals("non")) {
+    			// Demander le surnom
+    	    	System.out.println("    Entrez le surnom du joueur virtuel : ");
+    	    	this.name = sc.nextLine();
+    	    	System.out.println(" Assignation d'une stratégie secrète au joueur virtuel...");
+    	    	Random randomNumbers = new Random();
+    	    	int numStrategie = randomNumbers.nextInt(6);
+    	    	//GameStrategy randomStrategy= GameStrategy ;
+    	    	//this.strategy = randomStrategy;
+    	    	break;
+    		}else {
+    			System.out.println("Mauvaise saisie, veuillez recommencer");
+    		}
+    	}        
         this.ships = new ArrayList<>();
-        this.controlledHexs=new ArrayList<>();
-        //this.couleur=couleur;
+        for (int i=0;i<15; i++) {
+        	ships.add(new Ship(this, 1)); // Remplacer 1 par this.id
+        }
     }
     
     public SectorCard chooseSector(Board plat) {

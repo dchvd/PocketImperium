@@ -188,12 +188,16 @@ public class Player {
     	System.out.println("EXPAND");
     	Scanner scanner=new Scanner(System.in);
     	for (int i=0;i<effectivness;i++) {
+    		
+    		//Définir le hex où le vaisseau doit être ajouté
 			System.out.println("Choisissez un hex où vous souhaitez ajouter un vaisseau");
 			System.out.println("Entrez le x du hex choisi.");
 			int x=scanner.nextInt(); 
 			System.out.println("Entrez le y du hex choisi.");
 			int y=scanner.nextInt();
 			Hex choosedHex=Board.gameBoard.get(x).get(y);
+			
+			//Verifier si le hex choisi ets bien occupé par le joueur ou non
 			boolean hexOccupiedByThisPlayer=Helper.TestOccupationPlayerHex(choosedHex, this);
 			while(hexOccupiedByThisPlayer==false) {
 				choosedHex=null;
@@ -205,24 +209,16 @@ public class Player {
 				choosedHex=Board.gameBoard.get(x).get(y);
 				hexOccupiedByThisPlayer=Helper.TestOccupationPlayerHex(choosedHex, this);
 			}
-			choosedHex.getShipsOnHex().add(new Ship(this, (int) Math.random()));
-			int nbShipsTotal=choosedHex.getShipsOnHex().size();
-			System.out.println("Nombre maximal de vaisseaux sur le hex: "+choosedHex.getNbMaxShips());
-			System.out.println("Nombre de vaisseaux sur le hex: "+nbShipsTotal);
-			while(nbShipsTotal>choosedHex.getNbMaxShips()) {
-				System.out.println("Vous ne pouvez plus ajouter de vaiseaux sur cet hex car il est plein. Choisissez un autre hex.");
-				choosedHex=null;
-				System.out.println("Vous n'occupez pas le hex choisi. Veuillez choisir un hex que vous occupez.");
-				System.out.println("Entrez le x du hex choisi.");
-				x=scanner.nextInt(); 
-				System.out.println("Entrez le y du hex choisi.");
-				y=scanner.nextInt();
-				choosedHex=Board.gameBoard.get(x).get(y);
-				hexOccupiedByThisPlayer=Helper.TestOccupationPlayerHex(choosedHex, this);
-			}
-				//append choosedHex.getShipsOnHex() avec choosedHex
-				System.out.println("Votre vaisseau a bien été ajouté!");
-		}
+			
+			//Ajouter le vaisseau
+			Ship newShip = new Ship(this, (int) Math.random()); //A changer une fois que l'initialisation des vaisseaux sera faite
+			choosedHex.getShipsOnHex().add(newShip);
+			int nbShipsTotal = choosedHex.getShipsOnHex().size();
+			System.out.println("Votre vaisseau a bien été ajouté!");
+			System.out.println("Nombre de vaisseaux sur le hex: " + nbShipsTotal);
+				//this.toString();
+		
+    	}
 	}
 
     /**
@@ -404,6 +400,13 @@ public class Player {
     	return ships.isEmpty();
     }
     
+    public String toString() {
+    	return "Etat actuel de "+this.name
+    			+ "\n Hex occupés: "+this.controlledHexs
+    			+"\n Nombre de vaisseaux: "+this.ships
+    			+"\n Controle le Tri Prime: "+ this.controllsTriPrime;
+    }
+    
     //public boolean isWinner() {
     	
     //}
@@ -426,8 +429,8 @@ public class Player {
     	player1.getControlledHexs().get(1).getShipsOnHex().add(ship2);
     	
     	//controles
-    	System.out.println(player1.getControlledHexs().get(0).isTriPrime());
-    	System.out.println(player1.getControlledHexs().get(1).isTriPrime());
+    	System.out.println(player1.getControlledHexs().get(0).getNbMaxShips());
+    	System.out.println(player1.getControlledHexs().get(1).getNbMaxShips());
     	
     	
     	//Initialiser un second joueur
@@ -444,12 +447,12 @@ public class Player {
     	player2.getControlledHexs().get(1).getShipsOnHex().add(ship4);
     	
     	//controles
-    	System.out.println(player2.getControlledHexs().get(0).isTriPrime());
-    	System.out.println(player2.getControlledHexs().get(1).isTriPrime());
+    	System.out.println(player2.getControlledHexs().get(0).getNbMaxShips());
+    	System.out.println(player2.getControlledHexs().get(1).getNbMaxShips());
     	
     	//Test des commandes
     	//player1.plan();
-    	//player1.Expand(3);
+    	player1.Expand(3);
     	player1.Explore(2);
     	player1.Exterminate(1);
     }

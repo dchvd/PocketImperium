@@ -37,6 +37,8 @@ public class Hex {
 			this.nbMaxShips=1; // potentiellement 0
 		}
 	}
+	
+
 	public boolean isControlled() {
 		return controlled;
 	}
@@ -56,12 +58,14 @@ public class Hex {
 		this.xPosition = x; 
 		this.yPosition = y;
 	}
+	
 	@Override
     public String toString() {
         return "Hex{" +
                 " x='" + xPosition + '\'' +
                 " y='" + yPosition + '\'' +
                 " value='" + value + '\'' +
+                " nb_vaisseaux='"+this.shipsOnHex.size()+'\''+
                 '}';
     }
 	public int getxPosition() {

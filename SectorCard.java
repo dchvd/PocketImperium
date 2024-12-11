@@ -88,20 +88,7 @@ public class SectorCard {
     	}
     }
     
-    /*public void addHex(int relativeX, int relativeY, String typeH) {
-    	if (typeH=="TriPrime") {
-    		this.hexes.add(new Hex(anchorX + relativeX, anchorY + relativeY, true, false, false));
-    	}else if(typeH=="System1") {
-            this.hexes.add(new Hex(anchorX + relativeX, anchorY + relativeY, false, true, false));
-    	}else if(typeH=="System2") {
-            this.hexes.add(new Hex(anchorX + relativeX, anchorY + relativeY, false, false, true));
-    	}else {
-            this.hexes.add(new Hex(anchorX + relativeX, anchorY + relativeY, false, false, false));
-    	}
-    }
-	*/
-    
-    @Override
+    	@Override
     public String toString() {
     	StringBuilder sb = new StringBuilder();
     	sb.append("SectorCard : ").append(name).append('\n');
@@ -119,9 +106,6 @@ public class SectorCard {
         int[][] coordSystems = Helper.placeSystems("MiddleExteriorCard");
         for (int i=0; i<3; i++) {
         	for (int j=0; j<3; j++) {
-            	/*if ((i==0) && (j==2) || (i==2) && (j==2)) {
-            		typeHex = "regularHex";
-            	}*/
         		if ( (i==1) && (j==2) ) {
             		break;
             	}

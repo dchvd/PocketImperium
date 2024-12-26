@@ -17,6 +17,7 @@ public class Partie {
 	 */
     private int tour=0;
     
+    private int[] scores= {0,0,0};
  // ---- PLATEAU ----
     //board est composé des sectorCards, il permettra notamment de compter les scores
     //private SectorCard[][] board = new SectorCard[3][3];
@@ -28,17 +29,16 @@ public class Partie {
     
     /**
      * Le constructeur Partie permet de créer une partie du jeu Imperium Pocket
-     * @param sc 
-     * @param players est la liste des joueurs qui s'affronteront durant la partie
+     * @param sc scanner pour récupérer les informations données par le joueur
      */
     public Partie(Scanner sc) {
     	System.out.println(" --- Création des joueurs ! --- \n Chaque joueur doit choisir un surnom. \n");
     	System.out.println(" Joueur n°1 :");
-    	this.players.add(new Player(sc));
+    	this.players.add(new Player(sc, 0));
     	System.out.println("\n Joueur n°2 :");
-    	this.players.add(new Player(sc));
+    	this.players.add(new Player(sc, 1));
     	System.out.println("\n Joueur n°3 :");
-    	this.players.add(new Player(sc));
+    	this.players.add(new Player(sc, 2));
     	this.startGame(sc);
     }
     
@@ -46,10 +46,16 @@ public class Partie {
      * La fonction startGame permet de lancer la partie
      */
     public void startGame(Scanner sc) {
+		System.out.println("Le plateau est : ");
+		this.gameBoard.printCards();
+		this.gameBoard.printBoard();
     	System.out.println("------ Initialisation ! ------");
     	this.initialisation(sc);
-    	System.out.println("------ Tour suivant ! ------");
-    	sc.nextLine();
+    	System.out.println("\n \n ------ Tour suivant ! ------");
+    	//sc.nextLine() // utile?
+    	System.out.println("\n \n ------ Choix des secteurs sur lesquels gagner des points ! ------");
+    	this.calcScore(sc, 1); // sera pas ici à la fin
+		// ne pas oublier que quand c'est le dernier tour c'est pas calcScore qui est appelé mais finalCalcScore
     	//this.Tour(sc);
     	//this.tour++;
     	/*
@@ -59,6 +65,7 @@ public class Partie {
             this.tour++;
         }*/
         //declareWinner();
+    	System.out.println("------ Fin de la partie / Mise en Pause ! ------");
     }
     
     private void initialisation(Scanner sc) {
@@ -68,9 +75,9 @@ public class Partie {
     		this.gameBoard.printBoard();
     		while(true) {
     			System.out.println(player.getName()+ " : choisissez le système à habiter"
-    					+ "\n Entrez le x du Hex choisi ");
+    					+ "\n Entrez le x du Hex choisi : ");
     	    	int x = sc.nextInt();
-    	    	System.out.println("Entrez le y du hex choisi.");
+    	    	System.out.println("Entrez le y du hex choisi : ");
 				int y=sc.nextInt();
 				Hex choosedHex=this.gameBoard.gameBoard.get(x).get(y); // pourquoi elle est statique
 				if(this.gameBoard.verifyCapability(choosedHex)) {
@@ -79,14 +86,14 @@ public class Partie {
 	            	choosedHex.setControlledBy(player);
 	            	ArrayList<Ship> shipsOnHex = new ArrayList<Ship>();
 	            	shipsOnHex.add(player.getShips().get(0));
+	            	player.getShips().get(0).setPosition(x, y);
 	            	shipsOnHex.add(player.getShips().get(1));
+	            	player.getShips().get(1).setPosition(x, y);
 	            	choosedHex.setShipsOnHex(shipsOnHex);
 	            	break;
-
 				}else {
 					System.out.println("Secteur déjà occupé: veuillez en choisir un autre.");
 				}
-				
     		}
     	}
     	System.out.println("\n --- Chaque joueur doit désormais re placer deux bateaux sur un système de niveau 1. \n"
@@ -95,13 +102,14 @@ public class Partie {
     	List<Player> invertedPlayerList = new ArrayList<Player>();
     	invertedPlayerList = players.reversed();
     	
+    	
     	for (Player player : invertedPlayerList) {
     		this.gameBoard.printBoard();
     		while(true) {
-    			System.out.println(player.getName()+ " : choisissez le système à habiter"
+    			System.out.print(player.getName()+ " : choisissez le système à habiter"
     					+ "\n Entrez le x du Hex choisi ");
     	    	int x = sc.nextInt();
-    	    	System.out.println("Entrez le y du hex choisi.");
+    	    	System.out.print("Entrez le y du hex choisi.");
 				int y=sc.nextInt();
 				Hex choosedHex=this.gameBoard.gameBoard.get(x).get(y); // pourquoi elle est statique
 				if(this.gameBoard.verifyCapability(choosedHex)) {
@@ -109,11 +117,10 @@ public class Partie {
 	            	choosedHex.setControlled(true);
 	            	choosedHex.setControlledBy(player);
 	            	ArrayList<Ship> shipsOnHex = new ArrayList<Ship>();
-	            	shipsOnHex.add(player.getShips().get(0));
-	            	shipsOnHex.add(player.getShips().get(1));
+	            	shipsOnHex.add(player.getShips().get(2));
+	            	shipsOnHex.add(player.getShips().get(3));
 	            	choosedHex.setShipsOnHex(shipsOnHex);
 	            	break;
-
 				}else {
 					System.out.println("Secteur déjà occupé: veuillez en choisir un autre.");
 				}
@@ -203,26 +210,95 @@ public class Partie {
      * puis de les exécuter. A la fin du tour, la fonction compte les scores de chaque joueur pour ce tour,
      * puis met à jour le score global du joueur.
      */
-    private void Tour() {
+    private void Tour(Scanner sc) {
     	System.out.println("Tour " + tour);
-    	ArrayList <SectorCard> chosenSectors=null;
     	for (Player player : players) {
     		player.planCommands("1", "2", "3");// faux
     		player.executeCommands();
     		}
-    	for (Player player : players) {
-    		SectorCard actualSector = player.chooseSector(gameBoard);
-    		chosenSectors.add(actualSector);
+		// TODO
+    	// Sera ici : 
+    	//this.sustainShips(sc);
+		// Si c'est pas le dernier tour :
+    	// this.calcScore(sc, 1);
+
+		//si c'est le dernier tour : tout les systemes doublent de valeur
+		// this.calcScore(sc,2);
+    	this.endOfRound();
+    }
+
+	private void sustainShips(Scanner sc) {
+		for (List<Hex> rangee: this.gameBoard.gameBoard) {
+			for (Hex hexActuel: rangee) {
+				if (hexActuel.isControlled()){ // peut être enlevé
+					while (hexActuel.getNbMaxShips()< hexActuel.getShipsOnHex().size()) {
+						Ship shipSupp = hexActuel.getShipsOnHex().removeLast();
+						shipSupp.setPosition(-1,-1);
+						System.out.println("Un ship supprimé");
+					}
+				}
+			}
+		}
+	}
+
+	public void calcScore(Scanner sc, int scoring) { // est-ce que ça renvoie qqc
+    	ArrayList <SectorCard> chosenSectors=new ArrayList <SectorCard>();
+    	SectorCard actualSector;
+		boolean plusDeSecteurs=false;
+    	for (Player player : this.players) {
+    		while (true) {
+    			actualSector = player.chooseSector(this.gameBoard, sc);
+				// vérification qu'il reste des secteurs disponibles
+				//TODO pas sûre que ça marche mais vient d'etre
+				plusDeSecteurs=true;
+				for (SectorCard[] rangee: this.gameBoard.getBoard()) {
+					for (SectorCard card : rangee) {
+						if (!chosenSectors.contains(card) && !card.isEmpty()) {
+							plusDeSecteurs=false;
+						}
+					}
+				}
+				if (chosenSectors.contains(actualSector)) {
+    				System.out.println("Ce secteur a déjà été choisi, veuillez recommencer");
+    			}else if (actualSector.isEmpty()) {
+    				System.out.println("Ce secteur est vide, veuillez recommencer");
+    			}else if (actualSector.getIsTriPrime()) {
+    				System.out.println("Ce secteur est le TriPrime, veuillez recommencer");
+    			}else if(plusDeSecteurs){
+					System.out.println("Plus de secteurs disponibles.");
+    				break;
+    			}else{
+					break;
+				}
     		}
+    		chosenSectors.add(actualSector);
+    		this.scores[player.getId()]=actualSector.calculateScore(player, scoring);
+    	}
+		//TODO
+		// si c'est pas le dernier tour
+    	for (Player player : this.players) {
+    		if (player.isControllsTriPrime()) {
+    			while (true) {
+        			actualSector = player.chooseSector(this.gameBoard, sc);
+        			if (!chosenSectors.contains(actualSector)) {
+        				break;
+        			}
+        		}
+        		chosenSectors.add(actualSector);
+        		this.scores[player.getId()]=actualSector.calculateScore(player, scoring);
+    		}
+    	}
+    	System.out.println("Fin du tour ! \n Les scores sont : ");
+    	for (int i=0; i<3; i++) {
+    		System.out.println("Joueur : "+ this.players.get(i).getName() + " ---- Score : " + scores[i]);
+    	}
+    }
 
-    	 //calcul de scores
-     	 }
 
 
-    
-    /**
+	/**
      * Cette fonction permet d'arrêter la partie. Pour rappel, la partie s'arrête au bout de neuf tours, soit lorsqu'un
-     * joueur est éliminé
+     * joueur est éliminé. Le joueur peut aussi faire pause.
      * @return false si ce n'est pas encore la fin de la partie, true si c'est la fin de la partie
      */
     private boolean finPartie() {
@@ -234,7 +310,41 @@ public class Partie {
     
     //Determiner Gagnant
     private void declareWinner() {
-       
-    }
+		int maxScore=0;
+		int minScore=1000;
+		int idGagnant=0;
+		int idSecond = 0;
+		int idDernier=0;
+       for(int i=0; i<3; i++){
+		   if(this.scores[i]>maxScore) {
+			   maxScore=this.scores[i];
+			   idGagnant=i;
+		   }
+		   if(this.scores[i]<minScore) {
+			   minScore=this.scores[i];
+			   idDernier=i;
+		   }
+	   }
+	   //TODO changer c'est hyper moche
+
+	   if(idGagnant==0 && idDernier==1) {
+		   idSecond = 2;
+	   }else if(idGagnant==1 && idDernier==2) {
+		   idSecond = 0;
+	   }else if(idGagnant==1 && idDernier==0) {
+		   idSecond = 2;
+	   }else if(idGagnant==2 && idDernier==1) {
+		   idSecond = 0;
+	   }else if(idGagnant==0 && idDernier==2) {
+		   idSecond = 1;
+	   }else if(idGagnant==2 && idDernier==0) {
+		   idSecond = 1;
+	   }
+	   System.out.println("Fin du jeu ! \n Le gagnant est : "+ this.players.get(idGagnant).getName());
+	   System.out.println("Le podium des scores est :\n---- 1er : " + this.players.get(idGagnant).getName() + " Avec un score de " + scores[idGagnant]);
+	   System.out.println(" ---- 2er : " + this.players.get(idSecond).getName() + " Avec un score de " + scores[idSecond]);
+	   System.out.println(" ----  3eme : " + this.players.get(idDernier).getName() + " Avec un score de " + scores[idDernier]);
+
+	}
     
 }

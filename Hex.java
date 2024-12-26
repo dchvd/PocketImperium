@@ -37,11 +37,6 @@ public class Hex {
 			this.nbMaxShips=1; // potentiellement 0
 		}
 	}
-	
-
-	public boolean isControlled() {
-		return controlled;
-	}
 
 	public void setControlled(boolean controlled) {
 		this.controlled = controlled;
@@ -50,22 +45,22 @@ public class Hex {
 	public Player getControlledBy() {
 		return controlledBy;
 	}
-
+	
 	public void setControlledBy(Player controlledBy) {
+		this.controlled=true;
 		this.controlledBy = controlledBy;
 	}
 	public void setCoordinates(int x, int y) {
 		this.xPosition = x; 
 		this.yPosition = y;
 	}
-	
 	@Override
     public String toString() {
-        return "Hex{" +
-                " x='" + xPosition + '\'' +
+		String shipsInString = "*".repeat(this.shipsOnHex.size()); 
+        return " { x='" + xPosition + '\'' +
                 " y='" + yPosition + '\'' +
-                " value='" + value + '\'' +
-                " nb_vaisseaux='"+this.shipsOnHex.size()+'\''+
+                " syst='" + value + '\'' + ' ' +
+                shipsInString +
                 '}';
     }
 	public int getxPosition() {
@@ -81,6 +76,7 @@ public class Hex {
 	}
 	public void setShipsOnHex(ArrayList<Ship> shipsOnHex) {
 		this.shipsOnHex = shipsOnHex;
+		//this.shipsOnHex.get(0). // mettre dans les ships ou ils sont
 	}
 	public int getValue() {
 		return value;
@@ -101,6 +97,9 @@ public class Hex {
 	public boolean isSystemHex2() {
 		return systemHex2;
 	}
-	
+
+	public boolean isControlled() {
+		return controlled;
+	}
 	
 }

@@ -19,7 +19,7 @@ public class Board {
         // Générer les cartes extérieures
         List<SectorCard> middleExteriorCards = new ArrayList<>();
         List<SectorCard> exteriorCards = new ArrayList<>();
-        //ça part en couilles ici
+        //Générer les cartes extérieures du milieu
         middleExteriorCards.add(new SectorCard("MiddleExteriorCard"));
         middleExteriorCards.add(new SectorCard("MiddleExteriorCard"));
         
@@ -132,7 +132,7 @@ public class Board {
     public void printBoard() {
     	System.out.println("Plateau :");
         for (int i = 0; i < this.gameBoard.size(); i++) {
-        	System.out.println(this.gameBoard.get(i));
+        	 System.out.println(this.gameBoard.get(i));
         }
     }
     

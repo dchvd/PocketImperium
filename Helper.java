@@ -14,6 +14,7 @@ public class Helper {
 		}else {
 			empPossible=4;
 		}
+		System.out.println(typeCarte);
 	    boolean ValidPlacement = false;	
 	    int[][] coordSyst = {{0,0},{0,0},{0,0}};
 	    int[] placements = {0,0,0};
@@ -21,7 +22,11 @@ public class Helper {
 	    	for (int i = 0; i<placements.length; i++) {
 	    		placements[i]=randomNumbers.nextInt(empPossible);
 	    	}
-	        if (placements[0] !=placements[1] && placements[0] !=placements[2] ) {
+	        if (placements[0] !=placements[1] && placements[0] !=placements[2] && placements[1] !=placements[2] ) {
+				System.out.println("placements: ");
+				for(int i=0; i<placements.length; i++) {
+					System.out.println(placements[i]+" ");
+				}
 	        	ValidPlacement=true;
 	        }
 	    }
@@ -35,16 +40,15 @@ public class Helper {
 		    		coordSyst[i][1]=1;
 		    	}else if (placements[i]==2) {
 		    		coordSyst[i][0]=1;
-		    		coordSyst[i][1]=1;
+		    		coordSyst[i][1]=1; // devrait etre 1 0 ?
 		    	}else if (placements[i]==3) {
 		    		coordSyst[i][0]=2;
 		    		coordSyst[i][1]=0;
-		    	}else{
-		    		coordSyst[i][0]=2;
-		    		coordSyst[i][1]=1;
-		    	}
-		    	
-		    }else if (typeCarte =="MiddleExteriorCard") {
+		    	}else {
+					coordSyst[i][0] = 2;
+					coordSyst[i][1] = 1;
+				}
+		    }else if (typeCarte == "MiddleExteriorCard") {
 		    	if (placements[i]==0) {
 		    		coordSyst[i][0]=0;
 		    		coordSyst[i][1]=0;
@@ -62,6 +66,11 @@ public class Helper {
 		    	System.out.println("problème de type de carte");
 		    }
 	    }
+		System.out.println("Les coord syst : ");
+		for(int i=0; i<coordSyst.length; i++) {
+			System.out.print(coordSyst[i][0]+" ");
+			System.out.print(coordSyst[i][1]+" ");
+		}
 	    return coordSyst;
 	}
 	/**
@@ -118,20 +127,20 @@ public class Helper {
      * @return true si le hex est bien voisin, false sinon
      */
 	public static boolean CheckNeighboursHex(int xHexDeparture, int yHexDeparture, int xHexDestination, int yHexDestination) {
-		if((xHexDestination<=xHexDeparture+1)&&(xHexDestination>=xHexDeparture-1)){
-			if((yHexDestination<=yHexDeparture+1)&&(yHexDestination>=yHexDeparture-1)) {
+		if((xHexDestination<=xHexDeparture+1)||(xHexDestination>=xHexDeparture-1)){
+			if((yHexDestination<=yHexDeparture+1)||(yHexDestination>=yHexDeparture-1)) {
 				if(xHexDeparture%2==0) {
-					if((xHexDestination==xHexDeparture-1)&&(yHexDestination==yHexDeparture+1)) {
+					if((xHexDestination==xHexDeparture-1)||(yHexDestination==yHexDeparture-1)) {
 						return false;
-					}else if((xHexDestination==xHexDeparture+1)&&(yHexDestination==yHexDeparture+1)) {
+					}else if((xHexDestination==xHexDeparture+1)||(yHexDestination==yHexDeparture)) {
 						return false;
 					}else {
 						return true;
 					}
 				}else{
-					if((xHexDestination==xHexDeparture-1)&&(yHexDestination==yHexDeparture-1)) {
+					if((xHexDestination==xHexDeparture-1)||(yHexDestination==yHexDeparture+1)) {
 						return false;
-					}else if((xHexDestination==xHexDeparture+1)&&(yHexDestination==yHexDeparture-1)) {
+					}else if((xHexDestination==xHexDeparture+1)||(yHexDestination==yHexDeparture+1)) {
 						return false;
 					}else {
 						return true;

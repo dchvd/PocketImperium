@@ -14,8 +14,6 @@ public class SectorCard {
 	
     /**
      * La fonction permet de créer une carte de secteur
-     * @param anchorX correspond à la position en x (ligne) de la carte dans le plateau
-     * @param anchorY correspond à la position en y (colonne) de la carte dans le plateau 
      * @param type correspond au type de carte ("Central", "MiddleExterior", "Exterior")
      */
 	public SectorCard(String type) { //	public SectorCard(String name, String type) {
@@ -73,7 +71,10 @@ public class SectorCard {
     	this.isAlreadyChoosed=true;
     }
     public List<Hex> getHexes() {
-        return hexes;
+        return this.hexes;
+    }
+    public boolean getIsTriPrime() {
+    	return this.estTriPrime;
     }
 
     public void addHexInSector(int relativeX, int relativeY, String typeH) {
@@ -106,7 +107,7 @@ public class SectorCard {
         int[][] coordSystems = Helper.placeSystems("MiddleExteriorCard");
         for (int i=0; i<3; i++) {
         	for (int j=0; j<3; j++) {
-        		if ( (i==1) && (j==2) ) {
+        		if ((i==1) && (j==2)) {
             		break;
             	}
             	if ((coordSystems[0][0]==i && coordSystems[0][1]==j) || (coordSystems[1][0]==i && coordSystems[1][1]==j)) {
@@ -149,10 +150,39 @@ public class SectorCard {
             	}else if (coordSystems[2][0]==i && coordSystems[2][1]==j) {
             		typeHex = "System2";
             	}else {
-            		typeHex="RegularHex";
+            		typeHex="regularHex";
             	}
         		addHexInSector(i, j, typeHex);
         	} 
         }
     }
+	
+    public int calculateScore(Player player, int i) {
+    	int score=0;
+    	for(Hex currentHex : this.hexes) {
+    		System.out.println(currentHex);
+    		System.out.println("Controllé : " + currentHex.isControlled());
+    		if (currentHex.isControlled()) {
+    			System.out.println(" et par : " + currentHex.getControlledBy().getName());
+    			System.out.println("Celui du joueur en train d'etre testé : " + player.getId());
+    			System.out.println("Celui du joueur qui contrôle le currentHex : " + currentHex.getControlledBy().getId());
+    			
+    			if(player.getId()==currentHex.getControlledBy().getId()) { //player.getControlledHexs().contains(currentHex)
+        			score+= i*currentHex.getValue();
+        			System.out.println("valeur du hex : " + currentHex.getValue());
+        		}
+    		}
+    	}
+		return score;
+	}
+
+	
+    public boolean isEmpty() {
+    	for(Hex currentHex : this.hexes) {
+    		if(currentHex.isControlled()) {
+    			return false;
+    		}
+    	}
+		return true;
+	}
 }

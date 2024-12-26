@@ -2,9 +2,6 @@ package pocket_imperium;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import java.util.ArrayList;
-import java.util.Scanner;
-
 public class Backup {
 	
 	private ArrayList<Partie> parties=new ArrayList<Partie>();
@@ -34,7 +31,7 @@ public class Backup {
 	        			System.out.println("Sauvegarde n°" + i);
 	        		}
 	        		System.out.println("Entrez le numéro de la partie que vous souhaitez reprendre :");
-	        		try{
+	        		try{ // pas sûr qu'il faut refaire un try catch mais en meme temps sinon on sort trop loin
 	        			int num = Integer.parseInt(sc.nextLine());
 	        			if ((num>0) && (num<parties.size())) {
 	            			//parties.get(num).startGame(); // PAS START GAME MAIS AUTRE CHOSE

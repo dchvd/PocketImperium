@@ -71,14 +71,9 @@ public class Board {
                     	hexesCurrentCard.remove(5);
                     	hexesCurrentCard.remove(2);
                     	hexesCurrentCard.remove(0);
-                    }else if (i%2==1) {
-                    	if (j==0) {
-                    		hexesCurrentCard.remove(5);
-                    		hexesCurrentCard.remove(0);
-                    	}else if (j==2) {
+                    }else if (i==1) {
                     		hexesCurrentCard.remove(7);
                     		hexesCurrentCard.remove(2);
-                    	}
                     }
                     else if (i%2==0) {
                     	if (j==0 || j==2) {

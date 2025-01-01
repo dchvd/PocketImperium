@@ -201,6 +201,7 @@ public class Partie {
      * Fonction caractéristique d'un tour qui permet à chaque joueur à tour de rôle de choisir l'ordre des commandes,
      * puis de les exécuter. A la fin du tour, la fonction compte les scores de chaque joueur pour ce tour,
      * puis met à jour le score global du joueur.
+	 *
      */
     private void Tour(Board board) {
 		this.tour+=1;

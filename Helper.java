@@ -109,6 +109,7 @@ public class Helper {
 
 	}
 
+
 	/**
 	 * La fonction CheckNeighboursHex vérifie si le hex de destination choisi est bien voisin au hex de départ
 	 * @param xHexDeparture est la coordonnée x du hex de départ

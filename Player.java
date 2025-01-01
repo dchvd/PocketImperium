@@ -94,6 +94,7 @@ public class Player {
 		}
 	}
 
+
 	/**
 	 * La methode plan permet au joueur de planifier l'ordre dans lequel il souhaire executer les commandes.
 	 */

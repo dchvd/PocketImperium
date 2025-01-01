@@ -9,6 +9,7 @@ public class Ship {
 	private int xPosition;
 	private int yPosition;
 
+
 	//Constructeur
 	// lorsque le ship n'est pas placé sur un hex, il est en x=-1 y=-1
 	public Ship( Player owner, int id) {

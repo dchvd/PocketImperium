@@ -50,6 +50,7 @@ public class Player {
 				System.out.println("Mauvaise saisie, veuillez recommencer");
 			}
 		}
+		//Génération de vaisseaux
 		this.ships = new ArrayList<>();
 		for (int i=0;i<15; i++) {
 			ships.add(new Ship(this, 1)); // Remplacer 1 par this.id

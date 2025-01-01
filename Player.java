@@ -1,9 +1,8 @@
 package pocket_imperium;
-import java.util.List;
-import java.util.Scanner;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
-import java.util.Arrays;
+import java.util.Scanner;
 
 public class Player {
 	private String name;
@@ -39,14 +38,13 @@ public class Player {
 				System.out.println("\n Bienvenue " + this.name);
 				break;
 			}else if (estVirtuel.equals("non")) {
-				// Demander le surnom
+				this.isVirtual=true;
 				System.out.println("    Entrez le surnom du joueur virtuel : ");
 				this.name = sc.nextLine();
 				System.out.println(" Assignation d'une stratégie secrète au joueur virtuel...");
 				Random randomNumbers = new Random();
-				int numStrategie = randomNumbers.nextInt(6);
-				//GameStrategy randomStrategy= GameStrategy ;
-				//this.strategy = randomStrategy;
+				this.strategy = GameStrategy.values()[randomNumbers.nextInt(GameStrategy.values().length)];
+				System.out.println("Stratégie attribuée au joueur virtuel : " + this.strategy);
 				break;
 			}else {
 				System.out.println("Mauvaise saisie, veuillez recommencer");
@@ -99,32 +97,58 @@ public class Player {
 	 * La methode plan permet au joueur de planifier l'ordre dans lequel il souhaire executer les commandes.
 	 */
 	public void plan() {
-		//commands = null;
-		/**
-		 * RAPPEL POUR NOUS
+		this.commands.clear();
+		//Cas où le joueur est humain
+		if(!this.isVirtual){
+			int command;
+			Scanner scanner = new Scanner(System.in);
 
-		 int commandExpand=1;
-		 int commandExplore=2;
-		 int commandExterminate=3;
-		 */
-		int command;
-		Scanner scanner = new Scanner(System.in);
-
-		System.out.println("Planifiez l'ordre dans lequel vous souhaitez effectuer les commandes.");
-		System.out.println("Tapez 1 pour Expand");
-		System.out.println("Tapez 2 pour Explore");
-		System.out.println("Tapez 3 pour Exterminate");
-		for(int i=1;i<4;i++) {
-			System.out.println("Choisissez l'action num "+i+".");
-			command=scanner.nextInt();
-			while(command!=1&&command!=2&&command!=3) {
-				System.out.println("Le nombre entré n'est pas valide.");
-				System.out.println("Tapez 1 pour Expand");
-				System.out.println("Tapez 2 pour Explore");
-				System.out.println("Tapez 3 pour Exterminate");
+			System.out.println("Planifiez l'ordre dans lequel vous souhaitez effectuer les commandes.");
+			System.out.println("Tapez 1 pour Expand");
+			System.out.println("Tapez 2 pour Explore");
+			System.out.println("Tapez 3 pour Exterminate");
+			for(int i=1;i<4;i++) {
+				System.out.println("Choisissez l'action num "+i+".");
 				command=scanner.nextInt();
+				while(command!=1&&command!=2&&command!=3) {
+					System.out.println("Le nombre entré n'est pas valide.");
+					System.out.println("Tapez 1 pour Expand");
+					System.out.println("Tapez 2 pour Explore");
+					System.out.println("Tapez 3 pour Exterminate");
+					command=scanner.nextInt();
+				}
+				this.commands.add(command);
 			}
-			this.commands.add(command);
+			//Cas où le joueur est virtuel
+		}else{
+			ArrayList<Integer> remainingCommands = new ArrayList<>();
+			remainingCommands.add(1); // Expand
+			remainingCommands.add(2); // Explore
+			remainingCommands.add(3); // Exterminate
+			Random random = new Random();
+
+			if(this.strategy==GameStrategy.AGGRESSIVE){
+				this.commands.add(3);
+				remainingCommands.remove(Integer.valueOf(3));
+				while (!remainingCommands.isEmpty()) {
+					int randomIndex = random.nextInt(remainingCommands.size());
+					this.commands.add(remainingCommands.remove(randomIndex));
+				}
+			}else if(this.strategy==GameStrategy.EXPENDER){
+				this.commands.add(1);
+				remainingCommands.remove(Integer.valueOf(1));
+				while (!remainingCommands.isEmpty()) {
+					int randomIndex = random.nextInt(remainingCommands.size());
+					this.commands.add(remainingCommands.remove(randomIndex));
+				}
+			}else{
+				this.commands.add(2);
+				remainingCommands.remove(Integer.valueOf(2));
+				while (!remainingCommands.isEmpty()) {
+					int randomIndex = random.nextInt(remainingCommands.size());
+					this.commands.add(remainingCommands.remove(randomIndex));
+				}
+			}
 		}
 	}
 
@@ -198,18 +222,12 @@ public class Player {
 		this.controllsTriPrime = controllsTriPrime;
 	}
 
-
-
-	public void planCommands(String command1, String command2, String command3) {
-
-	}
-
 	/**
 	 * La fonction Expand permet au joueur d'ajouter au moins un de ses vaisseaux sur au moins un hex qu'il contrôle.
 	 * @param effectivness détermine le nombre de vaisseaux que le joueur peut ajouter. Elle est définie en fonction du nombre de joueurs ayant choisi la même commande
 	 */
 	public void Expand(int effectivness) {
-		System.out.println("----------EXPAND---------- \nz");
+		System.out.println("----------EXPAND---------- \n");
 		Scanner scanner=new Scanner(System.in);
 		for (int i=0;i<effectivness;i++) {
 
@@ -334,9 +352,17 @@ public class Player {
 					System.out.println("Choisissez le nombre de vaisseaux que vous souhaitez déplacer");
 					nbShipsToMove=scanner.nextInt();
 				}
-				//A FAIRE -> ajouter les vaisseaux au hex
+				//Ajoute les vaisseaux au hex choisi
+				List<Ship> shipsToMove = new ArrayList<>();
+				for (int j = 0; j < nbShipsToMove; j++) {
+					shipsToMove.add(hexDeparture.getShipsOnHex().remove(0));
+				}
+				hexDestination.getShipsOnHex().addAll(shipsToMove);
+				hexDestination.setControlledBy(this);
+				this.controlledHexs.add(hexDestination);
+				System.out.println("Vous avez pris contrôle du hex (" + xDestination + ", " + yDestination + ") avec " + nbShipsToMove + " vaisseaux.");
 
-				//Demande au joueur si il souhaite bouger cette même fleet un seconde fois
+				//Demande au joueur s'il souhaite bouger cette même fleet une seconde fois
 				nbMovement+=1;
 				//Donner la possibilité de bouger sa flotte une seconde fois
 				if((nbMovement<2)&&(!hexDestination.isTriPrime())) {
@@ -348,29 +374,11 @@ public class Player {
 					if(answer.equals("non")) {
 						nbMovement=0;
 						response=false;
-						//Bouge le vaisseau sur le nouveau Hex
-						hexDestination.setControlledBy(this);
-						hexDestination.getShipsOnHex().add(hexDeparture.getShipsOnHex().getFirst());
-						this.controlledHexs.add(hexDestination);
-
 						//Enregistre le vaisseau bougé dans la liste des vaisseaux qui ne peuvent plus être réutilisés
-
-
-						//Supprime le vaisseau de l'ancien hex
-						hexDeparture.getShipsOnHex().removeFirst();
-						System.out.println("Vous avez pris contrôle du sytème!");
 					}
 				}else {
 					nbMovement=0;
 					response=false;
-					//Bouge le vaisseau sur le nouveau Hex
-					hexDestination.setControlledBy(this);
-					hexDestination.getShipsOnHex().add(this.ships.getFirst());
-					this.controlledHexs.add(hexDestination);
-
-					//Supprime le vaisseau de l'ancien hex
-					hexDeparture.getShipsOnHex().removeFirst();
-					System.out.println("Vous avez pris contrôle du sytème!");
 				}
 			}
 			//Résumer les informations du joueur
@@ -586,10 +594,6 @@ public class Player {
 
 	}
 
-	public void executeCommands() {
-
-	}
-
 	public boolean isEliminated() {
 		return ships.isEmpty();
 	}
@@ -603,58 +607,5 @@ public class Player {
 
 
 	//public boolean isWinner() {
-
-	//}
-	// A ENLEVER (inutilisable en partie)
-
-	public static void main(String[] args) {
-
-		//Generer le plateau
-		Board board = new Board();
-		Scanner scanner=new Scanner(System.in);
-
-		//Initialiser un  premier joueur
-		//Hexs controlles
-		Player player1 = new Player(scanner);
-		player1.getControlledHexs().add(board.getGameBoard().get(0).get(3));
-		player1.getControlledHexs().add(board.getGameBoard().get(2).get(1));
-		player1.getControlledHexs().get(0).setControlledBy(player1);
-		player1.getControlledHexs().get(1).setControlledBy(player1);
-		//ships
-		Ship ship1 = new Ship(player1, 1);
-		Ship ship2 = new Ship(player1,2);
-		player1.getControlledHexs().get(0).getShipsOnHex().add(ship1);
-		player1.getControlledHexs().get(1).getShipsOnHex().add(ship2);
-
-		//controles
-		System.out.println(player1.getControlledHexs().get(0).getNbMaxShips());
-		System.out.println(player1.getControlledHexs().get(1).getNbMaxShips());
-
-
-		//Initialiser un second joueur
-		//Hexs controlles
-		Player player2=new Player(scanner);
-		player2.getControlledHexs().add(board.getGameBoard().get(1).get(3));
-		player2.getControlledHexs().add(board.getGameBoard().get(1).get(2));
-		player2.getControlledHexs().get(0).setControlledBy(player2);
-		player2.getControlledHexs().get(1).setControlledBy(player2);
-		//ships
-		Ship ship3=new Ship(player2, 3);
-		Ship ship4 = new Ship(player2, 4);
-		player2.getControlledHexs().get(0).getShipsOnHex().add(ship3);
-		player2.getControlledHexs().get(1).getShipsOnHex().add(ship4);
-
-		//controles
-		System.out.println(player2.getControlledHexs().get(0).getNbMaxShips());
-		System.out.println(player2.getControlledHexs().get(1).getNbMaxShips());
-
-		//Test des commandes
-		//player1.plan();
-		//player1.Expand(3);
-		//player1.Explore(2);
-		player1.Exterminate(1,board);
-	}
-
-
 }
 

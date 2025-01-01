@@ -11,7 +11,7 @@ public class Board {
 	private SectorCard[][] board = new SectorCard[3][3];
 	//private String name;
 	//gameBoard sera la grille de Hex que l'on utilise pour les fonctions expand, exterminate et explore
-    public List<List<Hex>> gameBoard = new ArrayList<>();
+    public static List<List<Hex>> gameBoard = new ArrayList<>();
     
 	public Board() {
 		// Création des cartes avec leurs points d'ancrage

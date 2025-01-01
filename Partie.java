@@ -28,8 +28,7 @@ public class Partie {
     
     /**
      * Le constructeur Partie permet de créer une partie du jeu Imperium Pocket
-     * @param sc 
-     * @param players est la liste des joueurs qui s'affronteront durant la partie
+     * @param sc
      */
     public Partie(Scanner sc) {
     	System.out.println(" --- Création des joueurs ! --- \n Chaque joueur doit choisir un surnom. \n");
@@ -127,7 +126,7 @@ public class Partie {
     /**
      * La methode perform permet aux joueurs de réaliser les commandes Expand, Explore et Exterminate
      */
-    public void perform() {
+    public void perform(Board board) {
     	Scanner scanner = new Scanner(System.in);
     	for(int i=1;i<4;i++) {
     		//Afficher la commande numero i de chaque joueur
@@ -176,7 +175,7 @@ public class Partie {
         				}else if(i==2) {
         					player.Explore(effectivenessExplore);
         				}else if(i==3) {
-        					player.Exterminate(effectivenessExterminate);
+        					player.Exterminate(effectivenessExterminate,board);
         				}
         			}
         		}else {
@@ -203,38 +202,57 @@ public class Partie {
      * puis de les exécuter. A la fin du tour, la fonction compte les scores de chaque joueur pour ce tour,
      * puis met à jour le score global du joueur.
      */
-    private void Tour() {
+    private void Tour(Board board) {
+		this.tour+=1;
     	System.out.println("Tour " + tour);
     	ArrayList <SectorCard> chosenSectors=null;
+		//Les joueurs choisissent dans quel ordre ils souhaitent effectuer leurs commandes
     	for (Player player : players) {
-    		player.planCommands("1", "2", "3");// faux
-    		player.executeCommands();
-    		}
+    		player.plan();
+		}
+		//Les actions de chaque joueur sont realisées
+		this.perform(board);
+		//Choix de secteurs pour le calcul des scores
     	for (Player player : players) {
     		SectorCard actualSector = player.chooseSector(gameBoard);
     		chosenSectors.add(actualSector);
-    		}
+		}
+		//calcul de scores
 
-    	 //calcul de scores
-     	 }
-
-
+		//Changement de start player
+		this.endOfRound();
+	}
     
     /**
-     * Cette fonction permet d'arrêter la partie. Pour rappel, la partie s'arrête au bout de neuf tours, soit lorsqu'un
+     * Cette fonction permet d'arrêter la partie. Pour rappel, la partie s'arrête soit au bout de neuf tours, soit lorsqu'un
      * joueur est éliminé
      * @return false si ce n'est pas encore la fin de la partie, true si c'est la fin de la partie
      */
-    private boolean finPartie() {
-    	if (this.tour>9) {
-    		return true; //ajouter l'option du si joueur éliminé
-    	}
-    	return false;
-    }
+    private boolean finPartie(int tour) {
+		boolean isEliminated = players.stream().anyMatch(Player::isEliminated);
+		return isEliminated || tour > 9;
+	}
     
     //Determiner Gagnant
     private void declareWinner() {
        
     }
+
+	public static void main(String[] args) {
+		System.out.println("**********Bienvenue dans Pocket Imperium!**********"); //message de bienvenue
+		Board board = new Board(); //Création du plateau
+		Scanner scanner=new Scanner(System.in); //Création du scanner
+		Partie partie=new Partie(scanner); //Création de la partie --> les joueurs s'enregistrent
+		partie.startGame(scanner);//début de la partie --> initialisation
+		//Jeu
+		for(int tour=1;tour<9;tour++) {
+			boolean finPartie = partie.finPartie(tour);
+			while(!finPartie) {
+				partie.Tour(board);
+			}
+		}
+		//On détermine le gagnant
+		partie.declareWinner();
+	}
     
 }

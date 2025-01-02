@@ -79,6 +79,7 @@ public class Hex {
 	public int getyPosition() {
 		return yPosition;
 	}
+
 	
 	public ArrayList<Ship> getShipsOnHex() {
 		return shipsOnHex;

@@ -92,7 +92,6 @@ public class Player {
 		if(!this.isVirtual){
 			int command;
 			Scanner scanner = new Scanner(System.in);
-
 			System.out.println("Planifiez l'ordre dans lequel vous souhaitez effectuer les commandes.");
 			System.out.println("Tapez 1 pour Expand");
 			System.out.println("Tapez 2 pour Explore");

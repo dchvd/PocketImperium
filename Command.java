@@ -1,6 +1,7 @@
 
 package pocket_imperium;
 
+
 public abstract class Command {
 	
 	//Attributs

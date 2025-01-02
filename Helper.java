@@ -157,6 +157,7 @@ public class Helper {
 		}
 	}
 
+
 	/**
 	 * La fonction removeShipsFromHex permet de retirer des vaisseaux du joueur d'un des Hex qu'il contrôle
 	 * @param nbShips correspond au nombre de vaisseaux que possede le joueur sur le hex

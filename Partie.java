@@ -317,6 +317,7 @@ public class Partie {
 		boolean isEliminated = players.stream().anyMatch(Player::isEliminated);
 		return isEliminated || tour > 9;
 	}
+
     
     //Determiner Gagnant
     private void declareWinner() {

@@ -15,6 +15,10 @@ public class Player {
 	private ArrayList<Hex> controlledHexs=new ArrayList<Hex>();
 	private int id;
 
+	public int getId() {
+		return id;
+	}
+
 	public ArrayList<Hex> getControlledHexs() {
 		return controlledHexs;
 	}
@@ -23,38 +27,80 @@ public class Player {
 		this.controlledHexs = controlledHexs;
 	}
 
-	public Player(Scanner sc, int id) {
-		// Demande si le joueur est virtuel
+	public Player(Scanner sc, int id, List<Color> availableColors) {
 		this.id = id;
 		while (true) {
 			System.out.print("Le joueur est-il humain? Entrez oui ou non : ");
 			String estVirtuel = sc.nextLine();
-			if (estVirtuel.equals("oui")) {
+
+			if (estVirtuel.equalsIgnoreCase("oui")) {
 				System.out.print("    Entrez votre surnom : ");
 				this.name = sc.nextLine();
-				System.out.print("    Entrez la couleur que vous souhaitez (j pour jaune...) : "); // finir
-				//char col = sc.nextChar(); // Voir comment faire ça (plus simple de faire avec des entrées de chiffres?)
-				// Rajouter des try catch partout du coup
-				//this.couleur=couleur;
-				System.out.println("\n Bienvenue " + this.name);
+				boolean couleurValide = false;
+				while (!couleurValide) {
+					System.out.print("    Entrez la couleur que vous souhaitez (j pour jaune, r pour rouge, v pour violet) : ");
+					char col = sc.nextLine().toLowerCase().charAt(0);
+					switch (col) {
+						case 'j':
+							if (availableColors.contains(Color.JAUNE)) {
+								this.couleur = Color.JAUNE;
+								availableColors.remove(Color.JAUNE);
+								couleurValide = true;
+							} else {
+								System.out.println("    Couleur jaune déjà choisie, veuillez en choisir une autre.");
+							}
+							break;
+						case 'r':
+							if (availableColors.contains(Color.ROUGE)) {
+								this.couleur = Color.ROUGE;
+								availableColors.remove(Color.ROUGE);
+								couleurValide = true;
+							} else {
+								System.out.println("    Couleur rouge déjà choisie, veuillez en choisir une autre.");
+							}
+							break;
+						case 'v':
+							if (availableColors.contains(Color.VIOLET)) {
+								this.couleur = Color.VIOLET;
+								availableColors.remove(Color.VIOLET);
+								couleurValide = true;
+							} else {
+								System.out.println("    Couleur violette déjà choisie, veuillez en choisir une autre.");
+							}
+							break;
+						default:
+							System.out.println("    Couleur invalide. Veuillez choisir parmi : j, r, v.");
+					}
+				}
+				System.out.println("\nBienvenue " + this.name + "! Votre couleur est " + this.couleur.toString().toLowerCase() + ".");
 				break;
-			}else if (estVirtuel.equals("non")) {
-				// Demander le surnom
-				System.out.println("    Entrez le surnom du joueur virtuel : ");
+
+			} else if (estVirtuel.equalsIgnoreCase("non")) {
+				System.out.print("    Entrez le surnom du joueur virtuel : ");
 				this.name = sc.nextLine();
-				System.out.println(" Assignation d'une stratégie secrète au joueur virtuel...");
+
+				System.out.println("Assignation d'une stratégie secrète au joueur virtuel...");
 				Random randomNumbers = new Random();
-				int numStrategie = randomNumbers.nextInt(6);
-				//GameStrategy randomStrategy= GameStrategy ;
-				//this.strategy = randomStrategy;
+				this.strategy = GameStrategy.values()[randomNumbers.nextInt(GameStrategy.values().length)];
+				System.out.println("Stratégie attribuée au joueur virtuel : " + this.strategy);
+
+				if (!availableColors.isEmpty()) {
+					this.couleur = availableColors.remove(randomNumbers.nextInt(availableColors.size()));
+					System.out.println("Couleur attribuée au joueur virtuel : " + this.couleur.toString().toLowerCase() + ".");
+				} else {
+					System.out.println("Aucune couleur disponible! Erreur dans l'initialisation des couleurs.");
+				}
+				this.isVirtual = true;
 				break;
-			}else {
-				System.out.println("Mauvaise saisie, veuillez recommencer");
+			} else {
+				System.out.println("Mauvaise saisie, veuillez recommencer.");
 			}
 		}
+
+		// Initialisation des vaisseaux du joueur
 		this.ships = new ArrayList<>();
-		for (int i=0;i<15; i++) {
-			ships.add(new Ship(this, this.id*15+i)); // Remplacer 1 par this.id
+		for (int i = 0; i < 15; i++) {
+			ships.add(new Ship(this, this.id * 15 + i));
 		}
 	}
 

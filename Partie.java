@@ -1,6 +1,7 @@
 package pocket_imperium;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
@@ -32,13 +33,14 @@ public class Partie {
      * @param sc scanner pour récupérer les informations données par le joueur
      */
     public Partie(Scanner sc) {
+		List<Color> availableColors = new ArrayList<>(Arrays.asList(Color.JAUNE, Color.ROUGE, Color.VIOLET));
     	System.out.println(" --- Création des joueurs ! --- \n Chaque joueur doit choisir un surnom. \n");
     	System.out.println(" Joueur n°1 :");
-    	this.players.add(new Player(sc,0));
+    	this.players.add(new Player(sc,0, availableColors));
     	System.out.println("\n Joueur n°2 :");
-    	this.players.add(new Player(sc,1));
+    	this.players.add(new Player(sc,1, availableColors));
     	System.out.println("\n Joueur n°3 :");
-    	this.players.add(new Player(sc,2));
+    	this.players.add(new Player(sc,2, availableColors));
     	this.startGame(sc);
     }
     
@@ -224,7 +226,7 @@ public class Partie {
 		this.perform(board);
 		//Choix de secteurs pour le calcul des scores
     	for (Player player : players) {
-    		SectorCard actualSector = player.chooseSector(gameBoard);
+    		SectorCard actualSector = player.chooseSector(gameBoard, sc);
     		chosenSectors.add(actualSector);
 			// TODO
 			// Sera ici :
@@ -368,7 +370,7 @@ public class Partie {
 		for(int tour=1;tour<9;tour++) {
 			boolean finPartie = partie.finPartie(tour);
 			while(!finPartie) {
-				partie.Tour(board);
+				partie.Tour(board, scanner);
 			}
 		}
 		//On détermine le gagnant

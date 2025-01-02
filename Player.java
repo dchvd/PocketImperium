@@ -13,7 +13,7 @@ public class Player {
 	private boolean isVirtual;
 	private boolean controllsTriPrime;
 	private ArrayList<Hex> controlledHexs=new ArrayList<Hex>();
-
+	private int id;
 
 	public ArrayList<Hex> getControlledHexs() {
 		return controlledHexs;
@@ -23,10 +23,11 @@ public class Player {
 		this.controlledHexs = controlledHexs;
 	}
 
-	public Player(Scanner sc) {
+	public Player(Scanner sc, int id) {
 		// Demande si le joueur est virtuel
+		this.id = id;
 		while (true) {
-			System.out.println("Le joueur est-il humain? Entrez oui ou non : ");
+			System.out.print("Le joueur est-il humain? Entrez oui ou non : ");
 			String estVirtuel = sc.nextLine();
 			if (estVirtuel.equals("oui")) {
 				System.out.print("    Entrez votre surnom : ");
@@ -38,59 +39,46 @@ public class Player {
 				System.out.println("\n Bienvenue " + this.name);
 				break;
 			}else if (estVirtuel.equals("non")) {
-				this.isVirtual=true;
+				// Demander le surnom
 				System.out.println("    Entrez le surnom du joueur virtuel : ");
 				this.name = sc.nextLine();
 				System.out.println(" Assignation d'une stratégie secrète au joueur virtuel...");
 				Random randomNumbers = new Random();
-				this.strategy = GameStrategy.values()[randomNumbers.nextInt(GameStrategy.values().length)];
-				System.out.println("Stratégie attribuée au joueur virtuel : " + this.strategy);
+				int numStrategie = randomNumbers.nextInt(6);
+				//GameStrategy randomStrategy= GameStrategy ;
+				//this.strategy = randomStrategy;
 				break;
 			}else {
 				System.out.println("Mauvaise saisie, veuillez recommencer");
 			}
 		}
-		//Génération de vaisseaux
 		this.ships = new ArrayList<>();
 		for (int i=0;i<15; i++) {
-			ships.add(new Ship(this, 1)); // Remplacer 1 par this.id
+			ships.add(new Ship(this, this.id*15+i)); // Remplacer 1 par this.id
 		}
 	}
 
-	public SectorCard chooseSector(Board plat) {
-		System.out.print(this.name);
-		System.out.println( ": Choisissez sur quel secteur vous souhaitez gagner des points ");
+	public SectorCard chooseSector(Board plat, Scanner sc) {
+		System.out.println(this.name + ": Choisissez sur quel secteur vous souhaitez gagner des points ");
 		plat.printCards();
-		plat.printBoard();
-		try (Scanner sc = new Scanner(System.in)) {
-			//Recupérer secteur
-			int x = 0;
-			int y = 0;
-			boolean coordXValide = false;
-			boolean coordYValide = false;
-			while (coordXValide) {
-				System.out.print("Vous souhaitez la carte de la ligne (0 à 2) : ");
-				coordXValide = sc.hasNextInt();
-				if (coordXValide==true) {
-					x = sc.nextInt();
-					if (x!=0 ||x!=1 ||x!=2) {
-						coordXValide = false;
-					}
+		while (true) {
+			try {
+				System.out.print("Entrez la ligne (0 à 2) : ");
+				int x = sc.nextInt();
+
+				System.out.print("Entrez la colonne (0 à 2) : ");
+				int y = sc.nextInt();
+
+				// Vérification des limites du plateau
+				if (x >= 0 && x <= 2 && y >= 0 && y <= 2) {
+					return plat.getBoard()[x][y];
+				} else {
+					System.out.println("Coordonnées hors limites. Réessayez.");
 				}
+			} catch (Exception e) {
+				System.out.println("Entrée invalide. Réessayez.");
+				sc.nextLine(); // Nettoie le buffer d'entrée
 			}
-			while (coordYValide) {
-				System.out.print(" et de la colonne (0 à 2) : ");
-				coordYValide = sc.hasNextInt();
-				if (coordYValide==true) {
-					y = sc.nextInt();
-					if (y!=0 ||y!=1 ||y!=2) {
-						coordYValide = false;
-					}
-				}else {
-					System.out.print(" Entrée incorrecte ");
-				}
-			}
-			return plat.getBoard()[x][y];
 		}
 	}
 

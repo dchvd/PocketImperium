@@ -9,11 +9,12 @@ public class Helper {
 	public static int[][] placeSystems (String typeCarte) {
 		Random randomNumbers = new Random();
 		int empPossible;
-		if (typeCarte=="ExteriorCard") {
+		if (typeCarte.equals("ExteriorCard")) {
 			empPossible = 5;
 		}else {
 			empPossible=4;
 		}
+		System.out.println(typeCarte);
 		boolean ValidPlacement = false;
 		int[][] coordSyst = {{0,0},{0,0},{0,0}};
 		int[] placements = {0,0,0};
@@ -21,8 +22,12 @@ public class Helper {
 			for (int i = 0; i<placements.length; i++) {
 				placements[i]=randomNumbers.nextInt(empPossible);
 			}
-			if (placements[0] !=placements[1] && placements[0] !=placements[2] ) {
-				ValidPlacement=true;
+			if (placements[0] !=placements[1] && placements[0] !=placements[2] && placements[1] !=placements[2]) {
+				System.out.println("placements: ");
+				for(int i=0; i<placements.length; i++) {
+					System.out.println(placements[i]+" ");
+				}
+				ValidPlacement = true;
 			}
 		}
 		for (int i = 0; i<placements.length; i++) {
@@ -44,7 +49,7 @@ public class Helper {
 					coordSyst[i][1]=1;
 				}
 
-			}else if (typeCarte =="MiddleExteriorCard") {
+			}else if (typeCarte.equals("MiddleExteriorCard")) {
 				if (placements[i]==0) {
 					coordSyst[i][0]=0;
 					coordSyst[i][1]=0;
@@ -61,6 +66,11 @@ public class Helper {
 			}else {
 				System.out.println("problème de type de carte");
 			}
+		}
+		System.out.println("Les coord syst : ");
+		for(int i=0; i<coordSyst.length; i++) {
+			System.out.print(coordSyst[i][0]+" ");
+			System.out.print(coordSyst[i][1]+" ");
 		}
 		return coordSyst;
 	}

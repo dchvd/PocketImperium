@@ -52,6 +52,7 @@ public class Hex {
 	}
 
 	public void setControlledBy(Player controlledBy) {
+		this.controlled=true;
 		this.controlledBy = controlledBy;
 	}
 	public void setCoordinates(int x, int y) {
@@ -61,13 +62,16 @@ public class Hex {
 	
 	@Override
     public String toString() {
-        return "Hex{" +
+        /**return "Hex{" +
                 " x='" + xPosition + '\'' +
                 " y='" + yPosition + '\'' +
                 " value='" + value + '\'' +
                 " nb_vaisseaux='"+this.shipsOnHex.size()+'\''+
-                '}';
+                '}';**/
+		String shipsInString = "*".repeat(this.shipsOnHex.size());
+		return " { x='" + xPosition + '\'' +" syst='" + value + '\'' + ' ' + shipsInString +'}';
     }
+
 	public int getxPosition() {
 		return xPosition;
 	}

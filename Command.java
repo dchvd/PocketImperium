@@ -4,12 +4,12 @@ package pocket_imperium;
 public abstract class Command {
 	
 	//Attributs
-	private Effectiveness effectivness;
+	protected Effectiveness effectiveness;
 	private String nomCommande;
 	
 	//Constructeur
-	public Command(Effectiveness effectivness, String nomCommande) {
-		this.effectivness=effectivness;
+	public Command(Effectiveness effectiveness, String nomCommande) {
+		this.effectiveness=effectiveness;
 		this.nomCommande=nomCommande;
 	}
 	

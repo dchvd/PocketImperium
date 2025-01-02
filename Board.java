@@ -20,6 +20,7 @@ public class Board {
         List<SectorCard> middleExteriorCards = new ArrayList<>();
         List<SectorCard> exteriorCards = new ArrayList<>();
         //ça part en couilles ici
+		//Génerer les cartes extérieures du milieu
         middleExteriorCards.add(new SectorCard("MiddleExteriorCard"));
         middleExteriorCards.add(new SectorCard("MiddleExteriorCard"));
         
@@ -71,7 +72,7 @@ public class Board {
                     	hexesCurrentCard.remove(5);
                     	hexesCurrentCard.remove(2);
                     	hexesCurrentCard.remove(0);
-                    }else if (i%2==1) {
+                    /**}else if (i%2==1) { D'après github
                     	if (j==0) {
                     		hexesCurrentCard.remove(5);
                     		hexesCurrentCard.remove(0);
@@ -79,7 +80,11 @@ public class Board {
                     		hexesCurrentCard.remove(7);
                     		hexesCurrentCard.remove(2);
                     	}
-                    }
+                    }**/
+					}else if(i==1){ //d'après github
+						hexesCurrentCard.remove(7);
+						hexesCurrentCard.remove(2);
+					}
                     else if (i%2==0) {
                     	if (j==0 || j==2) {
                     		hexesCurrentCard.remove(4);

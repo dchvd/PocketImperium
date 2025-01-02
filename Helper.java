@@ -14,7 +14,6 @@ public class Helper {
 		}else {
 			empPossible=4;
 		}
-		System.out.println(typeCarte);
 		boolean ValidPlacement = false;
 		int[][] coordSyst = {{0,0},{0,0},{0,0}};
 		int[] placements = {0,0,0};
@@ -23,10 +22,6 @@ public class Helper {
 				placements[i]=randomNumbers.nextInt(empPossible);
 			}
 			if (placements[0] !=placements[1] && placements[0] !=placements[2] && placements[1] !=placements[2]) {
-				System.out.println("placements: ");
-				for(int i=0; i<placements.length; i++) {
-					System.out.println(placements[i]+" ");
-				}
 				ValidPlacement = true;
 			}
 		}
@@ -66,11 +61,6 @@ public class Helper {
 			}else {
 				System.out.println("problème de type de carte");
 			}
-		}
-		System.out.println("Les coord syst : ");
-		for(int i=0; i<coordSyst.length; i++) {
-			System.out.print(coordSyst[i][0]+" ");
-			System.out.print(coordSyst[i][1]+" ");
 		}
 		return coordSyst;
 	}

@@ -69,7 +69,7 @@ public class Hex {
                 " nb_vaisseaux='"+this.shipsOnHex.size()+'\''+
                 '}';**/
 		String shipsInString = "*".repeat(this.shipsOnHex.size());
-		return " { x='" + xPosition + '\'' +" syst='" + value + '\'' + ' ' + shipsInString +'}';
+		return " { x=" + xPosition + "y=" + yPosition + "| systLevel=" + value + "ships="+ shipsInString +"}";
     }
 
 	public int getxPosition() {

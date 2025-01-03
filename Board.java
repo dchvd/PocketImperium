@@ -14,6 +14,7 @@ public class Board {
     public static List<List<Hex>> gameBoard = new ArrayList<>();
     
 	public Board() {
+		this.gameBoard.clear();
 		// Création des cartes avec leurs points d'ancrage
         SectorCard centralCard = new SectorCard("CentralCard"); // Milieu du plateau        
         // Générer les cartes extérieures
@@ -103,24 +104,18 @@ public class Board {
                     		}
 	                    }else if (hexesCurrentCard.size()==5) {
 	                    	for (int jbis=0; jbis<Math.abs(1-ibis)+1; jbis++) {
-	                    		//System.out.print("jbis = ");
-                    			//System.out.println(jbis);
 	                    		hexesCurrentCard.get(col).setCoordinates(i*3+ibis, colonne[i*3+ibis]);
                         		this.gameBoard.get(i*3+ibis).add(iterat.next());
                         		col++;
                         		colonne[i*3+ibis]++;	                    	}
 	                    }else if (hexesCurrentCard.size()==6) {
 	                    	for (int jbis=0; jbis<2; jbis++) {
-	                    		//System.out.print("jbis = ");
-                    			//System.out.println(jbis);
 	                    		hexesCurrentCard.get(col).setCoordinates(i*3+ibis, colonne[i*3+ibis]);
                         		this.gameBoard.get(i*3+ibis).add(iterat.next());
                         		col++;
                         		colonne[i*3+ibis]++;	                    	}
 	                    }else if (hexesCurrentCard.size()==7) {
 	                    	for (int jbis=0; jbis<-Math.abs(ibis-1)+3; jbis++) {
-	                    		//System.out.print("jbis = ");
-                    			//System.out.println(jbis);
                     			hexesCurrentCard.get(col).setCoordinates(i*3+ibis, colonne[i*3+ibis]);
                         		this.gameBoard.get(i*3+ibis).add(iterat.next());
                         		col++;
@@ -145,7 +140,6 @@ public class Board {
     
     public void printCards() {
     	StringBuilder sb = new StringBuilder();
-    	sb.append("Plateau :\n ");
         sb.append("Cartes:\n");
         for (int i=0; i<board.length; i++) {
         	sb.append(" - ").append(i).append("\n");

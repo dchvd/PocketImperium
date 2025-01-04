@@ -119,20 +119,20 @@ public class Helper {
 	 * @return true si le hex est bien voisin, false sinon
 	 */
 	public static boolean CheckNeighboursHex(int xHexDeparture, int yHexDeparture, int xHexDestination, int yHexDestination) {
-		if((xHexDestination<=xHexDeparture+1)||(xHexDestination>=xHexDeparture-1)){
-			if((yHexDestination<=yHexDeparture+1)||(yHexDestination>=yHexDeparture-1)) {
+		if((xHexDestination<=xHexDeparture+1)&&(xHexDestination>=xHexDeparture-1)){
+			if((yHexDestination<=yHexDeparture+1)&&(yHexDestination>=yHexDeparture-1)) {
 				if(xHexDeparture%2==0) {
-					if((xHexDestination==xHexDeparture-1)||(yHexDestination==yHexDeparture+1)) {
+					if((xHexDestination==xHexDeparture-1)&&(yHexDestination==yHexDeparture+1)) {
 						return false;
-					}else if((xHexDestination==xHexDeparture+1)||(yHexDestination==yHexDeparture+1)) {
+					}else if((xHexDestination==xHexDeparture+1)&&(yHexDestination==yHexDeparture+1)) {
 						return false;
 					}else {
 						return true;
 					}
 				}else{
-					if((xHexDestination==xHexDeparture-1)||(yHexDestination==yHexDeparture-1)) {
+					if((xHexDestination==xHexDeparture-1)&&(yHexDestination==yHexDeparture-1)) {
 						return false;
-					}else if((xHexDestination==xHexDeparture+1)||(yHexDestination==yHexDeparture-1)) {
+					}else if((xHexDestination==xHexDeparture+1)&&(yHexDestination==yHexDeparture-1)) {
 						return false;
 					}else {
 						return true;
@@ -141,7 +141,6 @@ public class Helper {
 			}else {
 				return false;
 			}
-
 		}else {
 			return false;
 		}
@@ -208,5 +207,20 @@ public class Helper {
 		}else {
 			return false;
 		}
+	}
+
+	public static ArrayList<Hex> findNeighboursOwnedByPlayer(Hex systemToInvade, Player player, Board board) {
+		ArrayList<Hex> neighboursOwnedByPlayer = new ArrayList<>();
+
+		// Obtenir les voisins du système
+		ArrayList<Hex> neighbours = findSystemNeighbours(systemToInvade, board);
+
+		// Filtrer les voisins contrôlés par le joueur
+		for (Hex neighbour : neighbours) {
+			if (neighbour.getControlledBy() == player) {
+				neighboursOwnedByPlayer.add(neighbour);
+			}
+		}
+		return neighboursOwnedByPlayer;
 	}
 }

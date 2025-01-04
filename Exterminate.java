@@ -1,5 +1,7 @@
 package pocket_imperium;
 
+import java.util.ArrayList;
+
 public class Exterminate{
 	private Hex systemToInvade;
 	private Hex systemToInvadeFrom;
@@ -9,7 +11,6 @@ public class Exterminate{
 	/**
 	 * Le constructeur Exterminate permet de vérifier que tous les choix faits par les joueurs sont corrects avant de lancer l'action
 	 * @param systemToInvade est le système que le joueur souhaite envahir
-	 * @param systemToInvadeFrom est le système à partir duquel le joueur souhaite envahir
 	 * @param nbShipsAttacker est le nombre de vaisseaux de l'attaquant
 	 * @param nbShipsDefendant est le nombre de vaisseaux du défendant
 	 * @param player est le joueur attaquant
@@ -93,27 +94,75 @@ public class Exterminate{
 	 * @param attacker est l'objet Player qui represente le joueur qui effectue la commande Exterminate
 	 * @return un message in diquant lequel des deux joueurs controle le systeme a la fin de l'execution de Exterminate, ou si le systeme n'est plus sous controlle. 
 	 */
-	public static String DetermineWinner(int nbShipsAttacker, int nbShipsDefendant, Hex systemToInvade, Player attacker) {
+	public static String DetermineWinner(int nbShipsAttacker, int nbShipsDefendant, Hex systemToInvade, Hex systemToInvadeFrom, Player attacker) {
+		// Cas où les deux forces sont égales
+		if (nbShipsAttacker == nbShipsDefendant) {
 
-		if(nbShipsAttacker==nbShipsDefendant) {
-			systemToInvade.setShipsOnHex(null);
-			systemToInvade.setControlled(false);
-			systemToInvade.setControlledBy(null);
-			return "Aucun gagnant: le système n'est plus controllé";
-		}else {
-			int nbShipsAttackerLeft=RemoveShipsAttacker(nbShipsAttacker, nbShipsDefendant);
-			int nbShipsDefendantLeft=RemoveShipsDefendant(nbShipsAttackerLeft, nbShipsDefendant);
-
-			if(nbShipsAttackerLeft>nbShipsDefendantLeft) {
-				Helper.GainControllHex(systemToInvade, nbShipsAttackerLeft,attacker);
-				return "Le gagnant est l'attaquant: il contrôle désormais le système attaqué";
-			}else if(nbShipsAttackerLeft<nbShipsDefendantLeft) {
-				for(int j=0;j<nbShipsDefendantLeft-nbShipsAttackerLeft;j++) {
-					systemToInvade.getShipsOnHex().remove(j);
-				}
-				return "Le gagnant est le défendant: il continue de controler le système attaqué";
+			// Supprimer tous les vaisseaux sur les hexs concernés
+			if (systemToInvade.getShipsOnHex() != null) {
+				systemToInvade.getShipsOnHex().clear();
 			}
+			if (systemToInvadeFrom.getShipsOnHex() != null) {
+				systemToInvadeFrom.getShipsOnHex().clear();
+			}
+
+			// Retirer le contrôle de l'attaquant sur l'hex de départ
+			attacker.getControlledHexs().remove(systemToInvadeFrom);
+
+			// Retirer le contrôle du défendant si le système était contrôlé
+			if (systemToInvade.getControlledBy() != null) {
+				Player defendant = systemToInvade.getControlledBy();
+				defendant.getControlledHexs().remove(systemToInvade);
+				systemToInvade.setControlled(false);
+				systemToInvade.setControlledBy(null);
+			}
+			return "Aucun gagnant : le système n'est plus contrôlé.";
 		}
-		return null;
+
+		// Calcul des forces restantes après le combat
+		int nbShipsAttackerLeft = Math.max(0, nbShipsAttacker - nbShipsDefendant);
+		int nbShipsDefendantLeft = Math.max(0, nbShipsDefendant - nbShipsAttacker);
+
+		// Cas où l'attaquant gagne
+		if (nbShipsAttackerLeft > nbShipsDefendantLeft) {
+
+			//Suppression du système de la liste des hexs contrôllés du défendant
+			Player defendant = systemToInvade.getControlledBy();
+			if (defendant != null) {
+				defendant.getControlledHexs().remove(systemToInvade);
+				systemToInvade.getShipsOnHex().clear();
+			}
+
+			//ajout du système à la liste des hexs controllés par l'attaquant
+			attacker.getControlledHexs().add(systemToInvade);
+			systemToInvade.setControlled(true);
+			systemToInvade.setControlledBy(attacker);
+
+			return "Le gagnant est l'attaquant : il contrôle désormais le système attaqué.";
+		}
+
+		// Cas où le défendant gagne
+		if (nbShipsDefendantLeft > nbShipsAttackerLeft) {
+
+			// Retirer les vaisseaux perdus du défendant
+			if (systemToInvade.getShipsOnHex() != null) {
+				// Assurez-vous que la taille ne dépasse pas les vaisseaux disponibles
+				int shipsToRemove = Math.min(nbShipsAttacker, systemToInvade.getShipsOnHex().size());
+				for (int i = 0; i < shipsToRemove; i++) {
+					systemToInvade.getShipsOnHex().remove(0);
+				}
+			}
+
+			// Retirer le contrôle de l'attaquant sur l'hex de départ
+			attacker.getControlledHexs().remove(systemToInvadeFrom);
+			systemToInvadeFrom.setControlled(false);
+			systemToInvadeFrom.setControlledBy(null);
+			systemToInvadeFrom.getShipsOnHex().clear();
+
+			return "Le gagnant est le défendant : il continue de contrôler le système attaqué.";
+		}
+
+		// Cas d'erreur imprévu
+		return "Erreur : résultat du combat non déterminé.";
 	}
 }

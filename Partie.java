@@ -1,9 +1,6 @@
 package pocket_imperium;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 /**
  * La classe Partie permet de gérer le déroulement d'une partie de Imperium Pocket.
@@ -53,10 +50,10 @@ public class Partie {
 		this.gameBoard.printBoard();
     	System.out.println("------ Initialisation ! ------");
     	this.initialisation(sc);
-		System.out.println("\n \n ------ Tour suivant ! ------");
+		//System.out.println("\n \n ------ Tour suivant ! ------");
 		//sc.nextLine() // utile?
-		System.out.println("\n \n ------ Choix des secteurs sur lesquels gagner des points ! ------");
-		this.calcScore(sc, 1); // sera pas ici à la fin
+		//System.out.println("\n \n ------ Choix des secteurs sur lesquels gagner des points ! ------");
+		//this.calcScore(sc, 1); // sera pas ici à la fin
 		// ne pas oublier que quand c'est le dernier tour c'est pas calcScore qui est appelé mais finalCalcScore
     	//this.Tour(sc);
     	//this.tour++;
@@ -67,34 +64,59 @@ public class Partie {
             this.tour++;
         }*/
         //declareWinner();
-		System.out.println("------ Fin de la partie / Mise en Pause ! ------");
+		//System.out.println("------ Fin de la partie / Mise en Pause ! ------");
     }
     
     private void initialisation(Scanner sc) {
+		Random random = new Random();
     	System.out.println("\n --- Début de la partie ! --- \n Chaque joueur doit positionner deux bateaux sur un système de niveau 1. \n"
     			+ " Chaque joueur doit être seul sur son secteur : vous ne pouvez pas placer des bateaux sur un secteur déjà occupé");
     	for (Player player : this.players) {
     		this.gameBoard.printBoard();
     		while(true) {
-    			System.out.println(player.getName()+ " : choisissez le système à habiter"
-    					+ "\n Entrez le x du Hex choisi ");
-    	    	int x = sc.nextInt();
-    	    	System.out.println("Entrez le y du hex choisi.");
-				int y=sc.nextInt();
-				Hex choosedHex=this.gameBoard.gameBoard.get(x).get(y); // pourquoi elle est statique
-				if(this.gameBoard.verifyCapability(choosedHex)) {
-	            	System.out.println("Secteur valide");
-	            	choosedHex.setControlled(true);
-	            	choosedHex.setControlledBy(player);
-	            	ArrayList<Ship> shipsOnHex = new ArrayList<Ship>();
-	            	shipsOnHex.add(player.getShips().get(0));
+				if(!player.isVirtual()){
+					System.out.println(player.getName()+ " : choisissez le système à habiter"
+							+ "\n Entrez le x du Hex choisi ");
+					int x = sc.nextInt();
+					System.out.println("Entrez le y du hex choisi.");
+					int y=sc.nextInt();
+					Hex choosedHex=this.gameBoard.gameBoard.get(x).get(y); // pourquoi elle est statique
+					if(this.gameBoard.verifyCapability(choosedHex)) {
+						System.out.println("Secteur valide");
+						choosedHex.setControlled(true);
+						choosedHex.setControlledBy(player);
+						ArrayList<Ship> shipsOnHex = new ArrayList<Ship>();
+						shipsOnHex.add(player.getShips().get(0));
+						player.getShips().get(0).setPosition(x, y);
+						shipsOnHex.add(player.getShips().get(1));
+						player.getShips().get(1).setPosition(x, y);
+						choosedHex.setShipsOnHex(shipsOnHex);
+						player.getControlledHexs().add(choosedHex);
+						break;
+					}else {
+						System.out.println("Secteur déjà occupé: veuillez en choisir un autre.");
+					}
+				}else{
+					System.out.println(player.getName()+" est entrain de choisir un secteur à habiter...");
+					int x=(int)(Math.random()*9);
+					int y = (int)(Math.random()*5);
+					Hex choosedHex=this.gameBoard.gameBoard.get(x).get(y);
+					while(!this.gameBoard.verifyCapability(choosedHex)) {
+						x=(int)(Math.random()*9);
+						y = (int)(Math.random()*5);
+						choosedHex=this.gameBoard.gameBoard.get(x).get(y);
+					}
+					choosedHex.setControlled(true);
+					choosedHex.setControlledBy(player);
+					ArrayList<Ship> shipsOnHex = new ArrayList<Ship>();
+					shipsOnHex.add(player.getShips().get(0));
 					player.getShips().get(0).setPosition(x, y);
-	            	shipsOnHex.add(player.getShips().get(1));
+					shipsOnHex.add(player.getShips().get(1));
 					player.getShips().get(1).setPosition(x, y);
-	            	choosedHex.setShipsOnHex(shipsOnHex);
-	            	break;
-				}else {
-					System.out.println("Secteur déjà occupé: veuillez en choisir un autre.");
+					choosedHex.setShipsOnHex(shipsOnHex);
+					player.getControlledHexs().add(choosedHex);
+					System.out.println(player.getName()+" a choisi son hex!");
+					break;
 				}
     		}
     	}
@@ -107,31 +129,52 @@ public class Partie {
     	for (Player player : invertedPlayerList) {
     		this.gameBoard.printBoard();
     		while(true) {
-    			System.out.print(player.getName()+ " : choisissez le système à habiter"
-    					+ "\n Entrez le x du Hex choisi ");
-    	    	int x = sc.nextInt();
-    	    	System.out.print("Entrez le y du hex choisi.");
-				int y=sc.nextInt();
-				Hex choosedHex=this.gameBoard.gameBoard.get(x).get(y); // pourquoi elle est statique
-				if(this.gameBoard.verifyCapability(choosedHex)) {
-	            	System.out.println("Secteur valide");
-	            	choosedHex.setControlled(true);
-	            	choosedHex.setControlledBy(player);
-	            	ArrayList<Ship> shipsOnHex = new ArrayList<Ship>();
-	            	shipsOnHex.add(player.getShips().get(0)); //supprimer ????
-	            	shipsOnHex.add(player.getShips().get(1)); //supprimer ????
+				if(!player.isVirtual()){
+					System.out.print(player.getName()+ " : choisissez le système à habiter"
+							+ "\n Entrez le x du Hex choisi ");
+					int x = sc.nextInt();
+					System.out.print("Entrez le y du hex choisi.");
+					int y=sc.nextInt();
+					Hex choosedHex=this.gameBoard.gameBoard.get(x).get(y); // pourquoi elle est statique
+					if(this.gameBoard.verifyCapability(choosedHex)) {
+						System.out.println("Secteur valide");
+						choosedHex.setControlled(true);
+						choosedHex.setControlledBy(player);
+						ArrayList<Ship> shipsOnHex = new ArrayList<Ship>();
+						//shipsOnHex.add(player.getShips().get(0)); //supprimer ????
+						//shipsOnHex.add(player.getShips().get(1)); //supprimer ????
+						shipsOnHex.add(player.getShips().get(2));
+						shipsOnHex.add(player.getShips().get(3));
+						choosedHex.setShipsOnHex(shipsOnHex);
+						player.getControlledHexs().add(choosedHex);
+						break;
+					}else {
+						System.out.println("Secteur déjà occupé: veuillez en choisir un autre.");
+					}
+				}else{
+					System.out.println(player.getName()+" est entrain de choisir un secteur à habiter...");
+					int x=(int)(Math.random()*9);
+					int y = (int)(Math.random()*5);
+					Hex choosedHex=this.gameBoard.gameBoard.get(x).get(y);
+					while(!this.gameBoard.verifyCapability(choosedHex)) {
+						x=(int)(Math.random()*9);
+						y = (int)(Math.random()*5);
+						choosedHex=this.gameBoard.gameBoard.get(x).get(y);
+					}
+					System.out.println("Secteur valide");
+					choosedHex.setControlled(true);
+					choosedHex.setControlledBy(player);
+					ArrayList<Ship> shipsOnHex = new ArrayList<Ship>();
 					shipsOnHex.add(player.getShips().get(2));
 					shipsOnHex.add(player.getShips().get(3));
-	            	choosedHex.setShipsOnHex(shipsOnHex);
-	            	break;
-				}else {
-					System.out.println("Secteur déjà occupé: veuillez en choisir un autre.");
+					choosedHex.setShipsOnHex(shipsOnHex);
+					player.getControlledHexs().add(choosedHex);
+					System.out.println(player.getName()+" a choisi son hex!");
+					break;
 				}
-				
     		}
     	}
     	System.out.println("Fin de l'initialisation de la partie");
-    	return;
 	}
     
     /**
@@ -140,13 +183,15 @@ public class Partie {
     public void perform(Board board) {
     	Scanner scanner = new Scanner(System.in);
     	for(int i=1;i<4;i++) {
+
     		//Afficher la commande numero i de chaque joueur
+			System.out.println("--------------------------------------------------");
     		System.out.println("Voici les commandes numero "+i+" de chaque joueur!");
     		for(int j=0; j<players.size();j++) {
     			Player player=players.get(j);
-    			int command =player.getCommands().get(i);
-    			System.out.print(player+": ");
-    			if(command==1) {
+    			int command =player.getCommands().get(i-1);
+				System.out.print(player.getName() + ": ");
+				if(command==1) {
     				System.out.println("Expand");
     			}else if(command==2) {
     				System.out.println("Explore");
@@ -154,47 +199,82 @@ public class Partie {
     				System.out.println("Exterminate");
     			}
     		}
+
     		//Determiner l'effectiveness pour chaque commande
     		int effectivenessExpand=4, effectivenessExplore=4, effectivenessExterminate=4;
+			int calcEffExpand=0, calcEffExplore=0, calcEffExterminate=0;
     		for(int k=0;k<players.size();k++) {
-    			if(players.get(k).getCommands().get(i)==1) {
-    				effectivenessExpand--;
+    			if(players.get(k).getCommands().get(i-1)==1) {
+    				calcEffExpand++;
     			}
-    			if(players.get(k).getCommands().get(i)==2) {
-    				effectivenessExplore--;
+    			if(players.get(k).getCommands().get(i-1)==2) {
+    				calcEffExplore++;
     			}
-    			if(players.get(k).getCommands().get(i)==3) {
-    				effectivenessExterminate--;
+    			if(players.get(k).getCommands().get(i-1)==3) {
+    				calcEffExterminate++;
     			}
-    			
     		}
+			if(calcEffExpand!=0){
+				effectivenessExpand-=calcEffExpand;
+				System.out.println("\nExpand effectiveness: "+effectivenessExpand);
+			}
+			if(calcEffExplore!=0){
+				effectivenessExplore-=calcEffExplore;
+				System.out.println("\nExplore effectiveness: "+effectivenessExplore);
+			}
+			if(calcEffExterminate!=0){
+				effectivenessExterminate-=calcEffExterminate;
+				System.out.println("\nExterminate effectiveness: "+effectivenessExterminate);
+			}
     		
     		//executer les commandes dans l'ordre suivant: Expand puis Explore puis Exterminate
-    		for(int j=0; j<players.size();j++) {
-        		Player player=players.get(j); //ok si la liste des joueurs est organisee de sorte à ce que le premier est le joueur principal
-        		System.out.println(player + ", souhaitez-vous performer cette commande? Répondez par 1 pour oui et 0 pour non"); //donne la possibilite au joueur d'effectuer sa commande ou non
-        		int response=scanner.nextInt();
-        		while((response!=1)&&(response!=0)) {
-        			System.out.println("Reponse non valide.");
-        			System.out.println(player + ", souhaitez-vous performer cette commande? Répondez par 1 pour oui et 0 pour non");
-            		response=scanner.nextInt();
-        		}
-        		if(response==1) {
-        			if (player.getCommands().get(i)==i) {
-        				if(i==1) {
-        					player.Expand(effectivenessExpand);
-        				}else if(i==2) {
-        					player.Explore(effectivenessExplore);
-        				}else if(i==3) {
-        					player.Exterminate(effectivenessExterminate,board);
-        				}
-        			}
-        		}else {
-        			System.out.println("Votre choix a bien été pris en compte. Vous n'effectuerez pas cette commande.");
-        		}
-    		}
+			int[] commandOrder = {1, 2, 3};
+			for(int command:commandOrder) {
+				if(command==1) {
+					System.out.println("\n----------Expand----------");
+				} else if (command==2) {
+					System.out.println("\n----------Explore----------");
+				}else{
+					System.out.println("\n----------Exterminate----------");
+				}
+				for(int j=0; j<players.size();j++) {
+					Player player=players.get(j); //ok si la liste des joueurs est organisee de sorte à ce que le premier est le joueur principal
+					int choosedCommand=player.getCommands().get(i-1);
+					if(choosedCommand==command){
+						if(!player.isVirtual()){
+							System.out.println(player + ", souhaitez-vous performer cette commande? Répondez par 1 pour oui et 0 pour non"); //donne la possibilite au joueur d'effectuer sa commande ou non
+							int response=scanner.nextInt();
+							while((response!=1)&&(response!=0)) {
+								System.out.println("Reponse non valide.");
+								System.out.println(player + ", souhaitez-vous performer cette commande? Répondez par 1 pour oui et 0 pour non");
+								response=scanner.nextInt();
+							}
+							if(response==1) {
+								if(command==1) {
+									player.Expand(effectivenessExpand);
+								}else if(command==2) {
+									player.Explore(effectivenessExplore);
+								}else{
+									player.Exterminate(effectivenessExterminate,board);
+								}
+							}else {
+								System.out.println("Votre choix a bien été pris en compte. Vous n'effectuerez pas cette commande.");
+							}
+						}else{
+							if(command==1) {
+								player.Expand(effectivenessExpand);
+							}else if(command==2) {
+								player.Explore(effectivenessExplore);
+							}else{
+								player.Exterminate(effectivenessExterminate,board);
+							}
+						}
+					}
+				}
+			}
     	}
     }
+
     /**
      * La methode endOfRound permet d'echanger les places du premier et du dernier joueur de la liste, afin que le dernier joueur de la liste devienne le Start Player
      */
@@ -224,25 +304,25 @@ public class Partie {
 		}
 		//Les actions de chaque joueur sont realisées
 		this.perform(board);
+
 		//Choix de secteurs pour le calcul des scores
     	for (Player player : players) {
     		SectorCard actualSector = player.chooseSector(gameBoard, sc);
     		chosenSectors.add(actualSector);
 			// TODO
 			// Sera ici :
-			//this.sustainShips(sc);
+			this.sustainShips(sc);
 			// Si c'est pas le dernier tour :
-			// this.calcScore(sc, 1);
-
-			//si c'est le dernier tour : tout les systemes doublent de valeur
-			// this.calcScore(sc,2);
+			if(tour<9){
+				this.calcScore(sc, 1);
+			}else{
+				this.calcScore(sc, 2);
+			}
 		}
-
-		//calcul de scores
-
 		//Changement de start player
 		this.endOfRound();
 	}
+
 	private void sustainShips(Scanner sc) {
 		for (List<Hex> rangee: this.gameBoard.gameBoard) {
 			for (Hex hexActuel: rangee) {
@@ -292,16 +372,18 @@ public class Partie {
 		}
 		//TODO
 		// si c'est pas le dernier tour
-		for (Player player : this.players) {
-			if (player.isControllsTriPrime()) {
-				while (true) {
-					actualSector = player.chooseSector(this.gameBoard, sc);
-					if (!chosenSectors.contains(actualSector)) {
-						break;
+		if(tour<9){
+			for (Player player : this.players) {
+				if (player.isControllsTriPrime()) {
+					while (true) {
+						actualSector = player.chooseSector(this.gameBoard, sc);
+						if (!chosenSectors.contains(actualSector)) {
+							break;
+						}
 					}
+					chosenSectors.add(actualSector);
+					this.scores[player.getId()]=actualSector.calculateScore(player, scoring);
 				}
-				chosenSectors.add(actualSector);
-				this.scores[player.getId()]=actualSector.calculateScore(player, scoring);
 			}
 		}
 		System.out.println("Fin du tour ! \n Les scores sont : ");
@@ -364,8 +446,8 @@ public class Partie {
 		System.out.println("**********Bienvenue dans Pocket Imperium!**********"); //message de bienvenue
 		Board board = new Board(); //Création du plateau
 		Scanner scanner=new Scanner(System.in); //Création du scanner
-		Partie partie=new Partie(scanner); //Création de la partie --> les joueurs s'enregistrent
-		partie.startGame(scanner);//début de la partie --> initialisation
+		Partie partie=new Partie(scanner); //Création de la partie --> les joueurs s'enregistrent + initialisation
+		//partie.startGame(scanner);//début de la partie --> initialisation
 		//Jeu
 		for(int tour=1;tour<9;tour++) {
 			boolean finPartie = partie.finPartie(tour);

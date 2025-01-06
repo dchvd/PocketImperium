@@ -3,11 +3,11 @@ package pocket_imperium;
 public class Ship {
 
 	//Attributs
-	private Color couleur;
 	private Player owner;
 	private int id;
 	private int xPosition;
 	private int yPosition;
+	private boolean placedOnBoard;
 
 
 	//Constructeur
@@ -17,16 +17,29 @@ public class Ship {
 		this.id=id;
 		this.xPosition=-1;
 		this.yPosition=-1;
-		//this.couleur=owner.getCouleur();
+		this.placedOnBoard=false;
 	}
 
 	public void setPosition(int x,int y){
 		this.xPosition=x;
 		this.yPosition=y;
+		this.placedOnBoard = true;
 	}
+
 	public void destroyShip(){
 		this.xPosition=-1;
 		this.yPosition=-1;
+		placedOnBoard=false;
+	}
 
+	public boolean isPlaced() {
+		return placedOnBoard;
+	}
+
+	public String getOwnerName() {
+		return owner.getName();
+	}
+	public String toString(){
+		return "Vaisseau de " + this.owner.getName() + " en x = " + xPosition + ", y = " + yPosition + "\n";
 	}
 }

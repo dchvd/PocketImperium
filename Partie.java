@@ -16,13 +16,7 @@ public class Partie {
     private int tour=0;
 	private int[] scores= {0,0,0};
     
- // ---- PLATEAU ----
-    //board est composé des sectorCards, il permettra notamment de compter les scores
-    //private SectorCard[][] board = new SectorCard[3][3];
-    //gameBoard sera la grille de Hex que l'on utilise pour les fonctions expand, exterminate et explore
-    //public List<List<Hex>> gameBoard = new ArrayList<>();
-    
-    //Génère le plateau : 
+    //Génère le plateau :
     private Board gameBoard = new Board();
     
     /**
@@ -46,17 +40,16 @@ public class Partie {
      */
     public void startGame(Scanner sc) {
 		System.out.println("Le plateau est : ");
-		this.gameBoard.printCards();
 		this.gameBoard.printBoard();
-    	System.out.println("------ Initialisation ! ------");
+    	System.out.println("------------------------------------ Initialisation ! ------------------------------------");
     	this.initialisation(sc);
-		//System.out.println("\n \n ------ Tour suivant ! ------");
-		//sc.nextLine() // utile?
+		for (int i = 0; i < 9; i++) {
+			this.Tour(this.gameBoard, sc);
+		}
 		//System.out.println("\n \n ------ Choix des secteurs sur lesquels gagner des points ! ------");
 		//this.calcScore(sc, 1); // sera pas ici à la fin
 		// ne pas oublier que quand c'est le dernier tour c'est pas calcScore qui est appelé mais finalCalcScore
-    	//this.Tour(sc);
-    	//this.tour++;
+    	//
     	/*
         while (!finPartie()) {
         	System.out.println("------ Tour suivant ! ------");
@@ -80,8 +73,11 @@ public class Partie {
 					int x = sc.nextInt();
 					System.out.println("Entrez le y du hex choisi.");
 					int y=sc.nextInt();
+					if(x>9 || x<0 || y>5 || y<0){
+						System.out.println("Le hex n'est pas valide (x doit être entre 0 et 8 et y entre 0 et 5");
+					}
 					Hex choosedHex=this.gameBoard.gameBoard.get(x).get(y); // pourquoi elle est statique
-					if(this.gameBoard.verifyCapability(choosedHex)) {
+					if(this.gameBoard.verifyCapability(choosedHex, player.isVirtual())) {
 						System.out.println("Secteur valide");
 						choosedHex.setControlled(true);
 						choosedHex.setControlledBy(player);
@@ -101,7 +97,7 @@ public class Partie {
 					int x=(int)(Math.random()*9);
 					int y = (int)(Math.random()*5);
 					Hex choosedHex=this.gameBoard.gameBoard.get(x).get(y);
-					while(!this.gameBoard.verifyCapability(choosedHex)) {
+					while(!this.gameBoard.verifyCapability(choosedHex, player.isVirtual())) {
 						x=(int)(Math.random()*9);
 						y = (int)(Math.random()*5);
 						choosedHex=this.gameBoard.gameBoard.get(x).get(y);
@@ -135,14 +131,12 @@ public class Partie {
 					int x = sc.nextInt();
 					System.out.print("Entrez le y du hex choisi.");
 					int y=sc.nextInt();
-					Hex choosedHex=this.gameBoard.gameBoard.get(x).get(y); // pourquoi elle est statique
-					if(this.gameBoard.verifyCapability(choosedHex)) {
+					Hex choosedHex=this.gameBoard.gameBoard.get(x).get(y);
+					if(this.gameBoard.verifyCapability(choosedHex, player.isVirtual())) {
 						System.out.println("Secteur valide");
 						choosedHex.setControlled(true);
 						choosedHex.setControlledBy(player);
 						ArrayList<Ship> shipsOnHex = new ArrayList<Ship>();
-						//shipsOnHex.add(player.getShips().get(0)); //supprimer ????
-						//shipsOnHex.add(player.getShips().get(1)); //supprimer ????
 						shipsOnHex.add(player.getShips().get(2));
 						shipsOnHex.add(player.getShips().get(3));
 						choosedHex.setShipsOnHex(shipsOnHex);
@@ -152,11 +146,11 @@ public class Partie {
 						System.out.println("Secteur déjà occupé: veuillez en choisir un autre.");
 					}
 				}else{
-					System.out.println(player.getName()+" est entrain de choisir un secteur à habiter...");
+					System.out.println(player.getName()+" est en train de choisir un secteur à habiter...");
 					int x=(int)(Math.random()*9);
 					int y = (int)(Math.random()*5);
 					Hex choosedHex=this.gameBoard.gameBoard.get(x).get(y);
-					while(!this.gameBoard.verifyCapability(choosedHex)) {
+					while(!this.gameBoard.verifyCapability(choosedHex, player.isVirtual())) {
 						x=(int)(Math.random()*9);
 						y = (int)(Math.random()*5);
 						choosedHex=this.gameBoard.gameBoard.get(x).get(y);
@@ -241,6 +235,7 @@ public class Partie {
 					Player player=players.get(j); //ok si la liste des joueurs est organisee de sorte à ce que le premier est le joueur principal
 					int choosedCommand=player.getCommands().get(i-1);
 					if(choosedCommand==command){
+						this.gameBoard.printBoard();
 						if(!player.isVirtual()){
 							System.out.println(player + ", souhaitez-vous performer cette commande? Répondez par 1 pour oui et 0 pour non"); //donne la possibilite au joueur d'effectuer sa commande ou non
 							int response=scanner.nextInt();
@@ -296,8 +291,7 @@ public class Partie {
      */
     public void Tour(Board board, Scanner sc) {
 		this.tour+=1;
-    	System.out.println("Tour " + tour);
-    	ArrayList <SectorCard> chosenSectors=null;
+    	System.out.println("------------------------------------------------------------- Tour " + tour+ " -------------------------------------------------------------");
 		//Les joueurs choisissent dans quel ordre ils souhaitent effectuer leurs commandes
     	for (Player player : players) {
     		player.plan();
@@ -306,79 +300,102 @@ public class Partie {
 		this.perform(board);
 
 		//Choix de secteurs pour le calcul des scores
-    	for (Player player : players) {
-    		SectorCard actualSector = player.chooseSector(gameBoard, sc);
-    		chosenSectors.add(actualSector);
-			// TODO
-			// Sera ici :
-			this.sustainShips(sc);
-			// Si c'est pas le dernier tour :
-			if(tour<9){
-				this.calcScore(sc, 1);
-			}else{
-				this.calcScore(sc, 2);
-			}
+		if(this.tour<8){
+			this.calcScore(sc, 1);
+		}else{
+			this.calcScore(sc, 2);
 		}
+		//TODO
+		this.sustainShips(sc);
+
 		//Changement de start player
 		this.endOfRound();
 	}
 
 	private void sustainShips(Scanner sc) {
+		System.out.println("\n \n ---------------------- Sustain Ships -------------------------- ");
 		for (List<Hex> rangee: this.gameBoard.gameBoard) {
 			for (Hex hexActuel: rangee) {
 				if (hexActuel.isControlled()){ // peut être enlevé
 					while (hexActuel.getNbMaxShips()< hexActuel.getShipsOnHex().size()) {
+						System.out.println("Le ship de " + hexActuel.getShipsOnHex().get(0).getOwnerName() + " en x=" + hexActuel.getxPosition() + ", y=" + hexActuel.getyPosition() + " n'a pas survécu"); //TODO meilleur affichage
 						Ship shipSupp = hexActuel.getShipsOnHex().removeLast();
-						shipSupp.setPosition(-1,-1);
-						System.out.println("Un ship supprimé");
+						shipSupp.destroyShip();
 					}
 				}
 			}
 		}
 	}
 
-	public void calcScore(Scanner sc, int scoring) { // est-ce que ça renvoie qqc
+	public void calcScore(Scanner sc, int scoring) {
+		System.out.println("-------------- Calcul des scores --------------");
 		ArrayList <SectorCard> chosenSectors=new ArrayList <SectorCard>();
-		SectorCard actualSector;
+		SectorCard actualSector = null;
 		boolean plusDeSecteurs=false;
 		for (Player player : this.players) {
 			while (true) {
-				actualSector = player.chooseSector(this.gameBoard, sc);
 				// vérification qu'il reste des secteurs disponibles
-				//TODO pas sûre que ça marche mais vient d'etre
 				plusDeSecteurs=true;
 				for (SectorCard[] rangee: this.gameBoard.getBoard()) {
 					for (SectorCard card : rangee) {
-						if (!chosenSectors.contains(card) && !card.isEmpty()) {
-							plusDeSecteurs=false;
+						for (Hex hex : card.getHexes()){
+							if (hex.isControlled()){
+								if (!chosenSectors.contains(card) && !(hex.getControlledBy().equals(player))) {
+									plusDeSecteurs=false;
+									break;
+								}
+							}
 						}
 					}
 				}
-				if (chosenSectors.contains(actualSector)) {
-					System.out.println("Ce secteur a déjà été choisi, veuillez recommencer");
-				}else if (actualSector.isEmpty()) {
-					System.out.println("Ce secteur est vide, veuillez recommencer");
-				}else if (actualSector.getIsTriPrime()) {
-					System.out.println("Ce secteur est le TriPrime, veuillez recommencer");
-				}else if(plusDeSecteurs){
+				if (plusDeSecteurs){
 					System.out.println("Plus de secteurs disponibles.");
 					break;
+				}
+				actualSector = player.chooseSector(this.gameBoard, sc);
+				if (chosenSectors.contains(actualSector)) {
+					System.out.println("Ce secteur a déjà été choisi, veuillez recommencer");
+				}else if (actualSector.isEmpty()) {System.out.println("Ce secteur est vide, veuillez recommencer");
+				}else if (actualSector.getIsTriPrime()) {
+					System.out.println("Ce secteur est le TriPrime, qui ne peut pas être choisi, veuillez recommencer");
 				}else{
+					System.out.println("Arrivé ici");
 					break;
 				}
 			}
 			chosenSectors.add(actualSector);
-			this.scores[player.getId()]=actualSector.calculateScore(player, scoring);
+			this.scores[player.getId()]=this.scores[player.getId()] + actualSector.calculateScore(player, scoring);
 		}
-		//TODO
-		// si c'est pas le dernier tour
-		if(tour<9){
+
+		// si ce n'est pas le dernier tour, le joueur qui controle le TriPrime peut choisir deux secteurs
+		if(this.tour<8){
 			for (Player player : this.players) {
 				if (player.isControllsTriPrime()) {
+					plusDeSecteurs=true;
+					for (SectorCard[] rangee: this.gameBoard.getBoard()) {
+						for (SectorCard card : rangee) {
+							for (Hex hex : card.getHexes()){
+								if (hex.isControlled()){
+									if (!chosenSectors.contains(card) && (hex.getControlledBy().equals(player))) {
+										plusDeSecteurs=false;
+										break;
+									}
+								}
+							}
+						}
+					}
+
+					if (plusDeSecteurs){
+						System.out.println("Plus de secteurs disponibles.");
+						break;
+					}
+
 					while (true) {
 						actualSector = player.chooseSector(this.gameBoard, sc);
 						if (!chosenSectors.contains(actualSector)) {
 							break;
+						}else{
+							System.out.println("Secteur déjà choisis");
 						}
 					}
 					chosenSectors.add(actualSector);

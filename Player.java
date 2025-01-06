@@ -1,4 +1,5 @@
 package pocket_imperium;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -14,6 +15,7 @@ public class Player {
 	private boolean controllsTriPrime;
 	private ArrayList<Hex> controlledHexs=new ArrayList<Hex>();
 	private int id;
+	private Hex firstSystemToInvade;
 
 	public int getId() {
 		return id;
@@ -99,33 +101,62 @@ public class Player {
 		// Initialisation des vaisseaux du joueur
 		this.ships = new ArrayList<>();
 		for (int i = 0; i < 15; i++) {
-			ships.add(new Ship(this, this.id * 15 + i));
+			ships.add(new Ship(this, i)); // avant : 15*this.id + i
 		}
 	}
 
 	public SectorCard chooseSector(Board plat, Scanner sc) {
-		System.out.println(this.name + ": Choisissez sur quel secteur vous souhaitez gagner des points ");
-		plat.printCards();
-		while (true) {
-			try {
-				System.out.print("Entrez la ligne (0 à 2) : ");
-				int x = sc.nextInt();
-
-				System.out.print("Entrez la colonne (0 à 2) : ");
-				int y = sc.nextInt();
-
-				// Vérification des limites du plateau
-				if (x >= 0 && x <= 2 && y >= 0 && y <= 2) {
-					return plat.getBoard()[x][y];
-				} else {
-					System.out.println("Coordonnées hors limites. Réessayez.");
-				}
-			} catch (Exception e) {
-				System.out.println("Entrée invalide. Réessayez.");
-				sc.nextLine(); // Nettoie le buffer d'entrée
-			}
+		System.out.println(this.name + ": choisissez sur quel vous souhaitez gagner des points ");
+		if (!this.isVirtual) {
+			plat.printCards();
 		}
-	}
+		SectorCard chosenCard = null;
+		if(!this.isVirtual){
+			while (true) {
+				try {
+					while(true){
+						System.out.print("Entrez la ligne (0 à 2) : ");
+						int x = sc.nextInt(); //TODO remplacer les nextInt par des nextLine
+
+						System.out.print("Entrez la colonne (0 à 2) : ");
+						int y = sc.nextInt();
+						chosenCard = plat.getBoard()[x][y];
+
+						// Vérification des limites du plateau
+						if (x >= 0 && x <= 2 && y >= 0 && y <= 2) {
+							if(Helper.TestOccupationPlayerCard(chosenCard, this)){
+								return chosenCard;
+							}else{
+								System.out.println("Le joueur n'a pas de vaisseaux dans cette carte");
+							}
+						} else {
+							System.out.println("Coordonnées hors limites. Réessayez.");
+						}
+					}
+				} catch (Exception e) {
+					System.out.println("Entrée invalide. Réessayez.");
+					sc.nextLine(); // Nettoie le buffer d'entrée
+				}
+			}
+		}else{
+			//Définir la carte où le joueur veut gagner des points
+			System.out.println("Le joueur virtuel choisit une carte...");
+			int x = 0;
+			int y = 0;
+			//Verifier si le secteur choisi est bien occupé par le joueur ou non
+			boolean sectorOccupiedByThisPlayer=false;
+			while(!sectorOccupiedByThisPlayer) {
+				x = (int)(Math.random()*3);
+				y = (int)(Math.random()*3);
+				chosenCard = plat.getBoard()[x][y];
+				sectorOccupiedByThisPlayer=Helper.TestOccupationPlayerCard(chosenCard, this);
+			}
+
+			//Afficher le choix
+			System.out.println("Le joueur virtuel a choisi le secteur : x = " + x + " y=" + y + "!");
+			return chosenCard;
+		}
+    }
 
 
 	/**
@@ -268,6 +299,10 @@ public class Player {
 	public void Expand(int effectiveness) {
 		Scanner scanner=new Scanner(System.in);
 		for (int i=0;i<effectiveness;i++) {
+			if (this.getFirstShipNotPlaced()==null){
+				System.out.println("Ce joueur n'a plus de vaisseaux en stock pour le moment, ce tour est sauté.");
+				return;
+			}
 			Hex choosedHex;
 
 			//Choix du hex où le joueur souhaite poser ses vaisseaux
@@ -319,8 +354,7 @@ public class Player {
 				}
 
 				//Ajouter le vaisseau
-				Ship newShip = this.ships.getFirst();
-				this.ships.removeFirst();
+				Ship newShip = this.getFirstShipNotPlaced();
 				newShip.setPosition(x,y);//A changer une fois que l'initialisation des vaisseaux sera faite
 				choosedHex.getShipsOnHex().add(newShip);
 				int nbShipsTotal = choosedHex.getShipsOnHex().size();
@@ -345,6 +379,14 @@ public class Player {
 		ArrayList<Integer> shipsIds=new ArrayList<Integer>();
 		int nbMovement=0;
 		Random random = new Random();
+		if(this.ships.isEmpty()) {
+			System.out.println("Le joueur " + this.getName() + " n'a plus de vaisseau ! Son tour est sauté");
+			return;
+		} else if (this.getControlledHexs().isEmpty()) {
+			System.out.println("Le joueur " + this.getName() + " n'a plus de Hex controllés ! Son tour est sauté");
+			return;
+		}
+
 		for(int i=0;i<effectivness;i++) {
 			Hex choosedHex;
 			if(!this.isVirtual){
@@ -382,7 +424,6 @@ public class Player {
 					yDeparture=hexDeparture.getyPosition();
 					boolean hexOccupied=Helper.TestOccupationHex(hexDestination); //tester si le hex est occupé
 					boolean hexIsNeighbour=Helper.CheckNeighboursHex(xDeparture,yDeparture,xDestination,yDestination); //tester si le hex est eloigné
-					//System.out.println(hexIsNeighbour);
 					//regler le cas du hex occupé
 					while(hexOccupied) {
 						System.out.println("Le hex que vous avez choisi est occupé par un autre joueur. Choisissez un autre hex.");
@@ -466,9 +507,9 @@ public class Player {
 						this.getControlledHexs().add(hexDestination);
 					}
 				}
-			}else{
+			}else{ // choix du joueur virtuel
 				//Choix d'un hex duquel il veut partir au hasard
-				System.out.println("Le joueur choisit le hex d'où il veut partir...");
+				System.out.println("Le joueur"+ this.getName() + "choisit le hex d'où il veut partir...");
 				Hex hexDeparture=this.controlledHexs.get(random.nextInt(controlledHexs.size()));
 				int xDeparture= hexDeparture.getxPosition();
 				int yDeparture= hexDeparture.getyPosition();
@@ -482,12 +523,18 @@ public class Player {
 				boolean hexOccupied=Helper.TestOccupationHex(hexDestination); //tester si le hex est occupé
 				boolean hexIsNeighbour=Helper.CheckNeighboursHex(xDeparture,yDeparture,xDestination,yDestination); //tester si le hex est eloigné
 
+				int nbEssais=0;
 				while(hexOccupied || !hexIsNeighbour){
+					nbEssais++;
 					xDestination = (int)(Math.random()*9);
 					yDestination = (int)(Math.random()*5);
 					hexDestination = Board.gameBoard.get(xDestination).get(yDestination);
 					hexOccupied=Helper.TestOccupationHex(hexDestination);
 					hexIsNeighbour=Helper.CheckNeighboursHex(xDeparture,yDeparture,xDestination,yDestination);
+					if (nbEssais >9*5){
+						System.out.println("Impossible de réaliser l'action Explore, le joueur n'a nul part ou aller depuis ce Hex");
+						return;
+					}
 				}
 
 				//Choix du nombre de vaisseaux
@@ -534,6 +581,15 @@ public class Player {
 		Hex systemToInvade = null; //hex à attaquer
 		Random random = new Random();
 
+		this.firstSystemToInvade=null;
+		if(this.ships.isEmpty()) {
+			System.out.println("Le joueur " + this.getName() + " n'a plus de vaisseau ! Son tour est sauté");
+			return;
+		}else if (this.controlledHexs.isEmpty()) {
+			System.out.println("Le joueur " + this.getName() + " n'a plus de Hex controllés ! Son tour est sauté");
+			return;
+		}
+
 		for(int i=0;i<effectivness;i++) {
 			//Afficher les infos du joueur
 			System.out.println(this);
@@ -570,24 +626,34 @@ public class Player {
 						System.out.println("Système (" + hex.getxPosition() + ", " + hex.getyPosition() + ")");
 					}
 
-					//Choisir un système cible
-					System.out.println("Choisissez un système à attaquer.");
-					System.out.print("Entrez le x : ");
-					int xInvade = scanner.nextInt();
-					System.out.print("Entrez le y : ");
-					int yInvade = scanner.nextInt();
-					scanner.nextLine();
-
-					systemToInvade = Board.gameBoard.get(xInvade).get(yInvade);
-					while (!neighbours.contains(systemToInvade) || Helper.TestOccupationPlayerHex(systemToInvade, this)) {
-						System.out.println("Système invalide. Choisissez un voisin non contrôlé par vous.");
+					//re attaquer :
+					int xInvade=0;
+					int yInvade=0;
+					if (firstSystemToInvade == null) {
+						//Choisir un système cible si on réattaque pas
+						System.out.println("Choisissez un système à attaquer.");
 						System.out.print("Entrez le x : ");
 						xInvade = scanner.nextInt();
 						System.out.print("Entrez le y : ");
 						yInvade = scanner.nextInt();
 						scanner.nextLine();
+						System.out.println("xInvade = "+ xInvade + " et yInvade =" + yInvade);
 						systemToInvade = Board.gameBoard.get(xInvade).get(yInvade);
+						while (!neighbours.contains(systemToInvade) || Helper.TestOccupationPlayerHex(systemToInvade, this)) {
+							System.out.println("Système invalide. Choisissez un voisin non contrôlé par vous.");
+							System.out.print("Entrez le x : ");
+							xInvade = scanner.nextInt();
+							System.out.print("Entrez le y : ");
+							yInvade = scanner.nextInt();
+							scanner.nextLine();
+							systemToInvade = Board.gameBoard.get(xInvade).get(yInvade);
+						}
+					}else{
+						systemToInvade = firstSystemToInvade;
+						xInvade = systemToInvade.getxPosition();
+						yInvade = systemToInvade.getyPosition();
 					}
+
 
 					//Choisir le nombre de vaisseaux pour l'attaque
 					System.out.println("Combien de vaisseaux souhaitez-vous utiliser pour attaquer ?");
@@ -600,15 +666,16 @@ public class Player {
 					}
 
 					//Supprimer les vaisseaux du système à partir duquel on a attaqué
-					if(nbShipsAttacker==systemToInvadeFrom.getShipsOnHex().size()){ //cas où tous les vaisseaux de l'attaquant sont utilisés
+					for (int index = 0; index < nbShipsAttacker; index++) {
+						systemToInvadeFrom.getShipsOnHex().getFirst().destroyShip();
+						systemToInvadeFrom.getShipsOnHex().removeFirst();
+					}
+
+					if(nbShipsAttacker==systemToInvadeFrom.getShipsOnHex().size()) { //cas où tous les vaisseaux de l'attaquant sont utilisés
 						this.getControlledHexs().remove(systemToInvadeFrom);
-						systemToInvadeFrom.getShipsOnHex().clear();
+						//systemToInvadeFrom.getShipsOnHex().clear();
 						systemToInvadeFrom.setControlledBy(null);
 						systemToInvadeFrom.setControlled(false);
-					}else{
-						for(int ship=0;ship<nbShipsAttacker;ship++){ //cas où pas tous les vaisseaux de l'attaquant sont utilisés
-							systemToInvadeFrom.getShipsOnHex().remove(0);
-						}
 					}
 
 					//Déterminer le gagnant
@@ -618,12 +685,13 @@ public class Player {
 
 					if(result.equals("Le gagnant est l'attaquant : il contrôle désormais le système attaqué.")){
 						for(int ship=0;ship<(nbShipsAttacker-nbShipsDefendant);ship++){
-							//Ajouter le vaisseau
-							Ship newShip = this.ships.getFirst();
-							this.ships.removeFirst();
-							newShip.setPosition(xInvade,yInvade);//A changer une fois que l'initialisation des vaisseaux sera faite
-							systemToInvade.getShipsOnHex().add(newShip);
+							//Ajouter le(s) vaisseau(x) du gagnant au Hex capturé
+							Ship newShip = this.getFirstShipNotPlaced();
+                            assert newShip != null;
+                            newShip.setPosition(xInvade,yInvade);
+							systemToInvade.addShipOnHex(newShip);
 						}
+
 						if(systemToInvade.isTriPrime()){
 							this.setControllsTriPrime(true);
 						}
@@ -653,75 +721,110 @@ public class Player {
 					}
 				}
 			}else{ //cas du joueur virtuel
-				System.out.println("Le joueur virtuel choisit à partir de quel système il souhaite envahir...");
-				//Choisir un système contrôlé pour attaquer
-				Hex systemToInvadeFrom = this.controlledHexs.get(random.nextInt(controlledHexs.size()));
-				int xToInvadeFrom = systemToInvadeFrom.getxPosition();
-				int yToInvadeFrom = systemToInvadeFrom.getyPosition();
-				System.out.println("Système choisi pour attaquer : (" + xToInvadeFrom + ", " + yToInvadeFrom + ")");
+				boolean continueAttack = true;
+				while (continueAttack) {
+					System.out.println("Le joueur virtuel choisit à partir de quel système il souhaite envahir...");
+					//Choisir un système contrôlé pour attaquer
+					Hex systemToInvadeFrom = this.controlledHexs.get(random.nextInt(controlledHexs.size()));
+					int xToInvadeFrom = systemToInvadeFrom.getxPosition();
+					int yToInvadeFrom = systemToInvadeFrom.getyPosition();
+					System.out.println("Système choisi pour attaquer : (" + xToInvadeFrom + ", " + yToInvadeFrom + ")");
 
-				//Trouver les systèmes voisins attaquables
-				ArrayList<Hex> systemNeighbours = Helper.findSystemNeighbours(systemToInvadeFrom, board);
+					//Trouver les systèmes voisins attaquables
+					ArrayList<Hex> systemNeighbours = Helper.findSystemNeighbours(systemToInvadeFrom, board);
 
-				// Filtrer les voisins pour exclure ceux déjà contrôlés par le joueur
-				ArrayList<Hex> attackableSystems = new ArrayList<>();
-				for (Hex neighbour : systemNeighbours) {
-					if (!this.controlledHexs.contains(neighbour)) {
-						attackableSystems.add(neighbour);
+					// Filtrer les voisins pour exclure ceux déjà contrôlés par le joueur
+					ArrayList<Hex> attackableSystems = new ArrayList<>();
+					for (Hex neighbour : systemNeighbours) {
+						if (!this.controlledHexs.contains(neighbour)) {
+							attackableSystems.add(neighbour);
+						}
+					}
+
+					// Si aucun système n'est attaquable, arrêter
+					if (attackableSystems.isEmpty()) {
+						System.out.println("Aucun système attaquable à partir de (" + xToInvadeFrom + ", " + yToInvadeFrom + ").");
+						return;
+					}
+
+					//Choisir un système cible parmi les voisins attaquables, et vérifier qu'on réattaque pas un système
+					int xTarget=0;
+					int yTarget=0;
+					if (firstSystemToInvade == null) {
+						systemToInvade = attackableSystems.get(random.nextInt(attackableSystems.size()));
+						xTarget = systemToInvade.getxPosition();
+						yTarget = systemToInvade.getyPosition();
+						System.out.println("Système choisi à attaquer : (" + xTarget + ", " + yTarget + ")");
+					}else{
+						systemToInvade = firstSystemToInvade;
+						xTarget = systemToInvade.getxPosition();
+						yTarget = systemToInvade.getyPosition();
+
+					}
+
+					//Déterminer le nombre de vaisseaux à utiliser
+					System.out.println("Le joueur virtuel choisit combien de vaisseaux utiliser pour attaquer...");
+					int nbShipsAvailable = systemToInvadeFrom.getShipsOnHex().size();
+
+					int nbShipsToAttack = random.nextInt(nbShipsAvailable) + 1; // Au moins 1 vaisseau
+					for (int index = 0; index < nbShipsToAttack; index++) {
+						systemToInvadeFrom.getShipsOnHex().getFirst().destroyShip();
+						systemToInvadeFrom.getShipsOnHex().removeFirst();
+					}
+					if(nbShipsAvailable==nbShipsToAttack){
+						this.controlledHexs.remove(systemToInvadeFrom);
+						systemToInvadeFrom.setControlled(false);
+						systemToInvadeFrom.setControlledBy(null);
+					}
+					System.out.println("Nombre de vaisseaux choisis pour l'attaque : " + nbShipsToAttack);
+
+					// Nombre de vaisseaux défendant
+					nbShipsDefendant = systemToInvade.getShipsOnHex().size();
+
+					// Exécuter l'attaque
+					System.out.println("Le joueur virtuel attaque avec " + nbShipsToAttack + " vaisseaux contre " + nbShipsDefendant + " vaisseaux.");
+					String result = Exterminate.DetermineWinner(nbShipsToAttack, nbShipsDefendant, systemToInvade, systemToInvadeFrom, this);
+					System.out.println(result + "\n");
+
+					// Gérer le cas où l'attaquant gagne
+					if(result.equals("Le gagnant est l'attaquant : il contrôle désormais le système attaqué.")){
+						for (int ship=0;ship<(nbShipsToAttack-nbShipsDefendant);ship++){
+							//Ajouter le vaisseau
+							Ship newShip = this.getFirstShipNotPlaced();
+							newShip.setPosition(xTarget,yTarget);//A changer une fois que l'initialisation des vaisseaux sera faite
+							systemToInvade.addShipOnHex(newShip);
+						}
+						if(systemToInvade.isTriPrime()){
+							this.setControllsTriPrime(true);
+						}
+					}
+
+					if (result.equals("Le gagnant est le défendant : il continue de contrôler le système attaqué.") && systemToInvadeFrom.isTriPrime()) {
+						this.setControllsTriPrime(false);
+					}
+					if(result.equals("Le gagnant est le défendant : il continue de contrôler le système attaqué.")){
+						//Vérifier les hexs voisins appartenant à l'attaquant
+						ArrayList<Hex> attackerNeighbours = Helper.findNeighboursOwnedByPlayer(systemToInvade, this, board);
+						if (!attackerNeighbours.isEmpty()) {
+							int attaqueOuPas = random.nextInt(2);
+							if(attaqueOuPas==1){
+								System.out.println("Le joueur décide de ré attaquer! ");
+								this.firstSystemToInvade = systemToInvade;
+								continueAttack = true;
+							}else{
+								this.firstSystemToInvade = null;
+								continueAttack = false;
+							}
+						} else {
+							System.out.println("Aucun hex voisin contrôlé pour attaquer à nouveau.");
+							continueAttack = false;
+						}
+					}
+					if(this.controlledHexs.isEmpty()){
+						continueAttack= false;
 					}
 				}
 
-				// Si aucun système n'est attaquable, arrêter
-				if (attackableSystems.isEmpty()) {
-					System.out.println("Aucun système attaquable à partir de (" + xToInvadeFrom + ", " + yToInvadeFrom + ").");
-					return;
-				}
-
-				//Choisir un système cible parmi les voisins attaquables
-				systemToInvade = attackableSystems.get(random.nextInt(attackableSystems.size()));
-				int xTarget = systemToInvade.getxPosition();
-				int yTarget = systemToInvade.getyPosition();
-				System.out.println("Système choisi à attaquer : (" + xTarget + ", " + yTarget + ")");
-
-				//Déterminer le nombre de vaisseaux à utiliser
-				System.out.println("Le joueur virtuel choisit combien de vaisseaux utiliser pour attaquer...");
-				int nbShipsAvailable = systemToInvadeFrom.getShipsOnHex().size();
-				int nbShipsToAttack = random.nextInt(nbShipsAvailable) + 1; // Au moins 1 vaisseau
-				for (int index = 0; index < nbShipsToAttack; index++) {
-					systemToInvadeFrom.getShipsOnHex().remove(0);
-				}
-				if(nbShipsAvailable==nbShipsToAttack){
-					this.controlledHexs.remove(systemToInvadeFrom);
-					systemToInvadeFrom.setControlled(false);
-					systemToInvadeFrom.setControlledBy(null);
-				}
-				System.out.println("Nombre de vaisseaux choisis pour l'attaque : " + nbShipsToAttack);
-
-				// Nombre de vaisseaux défendant
-				nbShipsDefendant = systemToInvade.getShipsOnHex().size();
-
-				// Exécuter l'attaque
-				System.out.println("Le joueur virtuel attaque avec " + nbShipsToAttack + " vaisseaux contre " + nbShipsDefendant + " vaisseaux.");
-				String result = Exterminate.DetermineWinner(nbShipsToAttack, nbShipsDefendant, systemToInvade, systemToInvadeFrom, this);
-				System.out.println(result);
-
-				// Gérer le cas où l'attaquant gagne
-				if(result.equals("Le gagnant est l'attaquant : il contrôle désormais le système attaqué.")){
-					for(int ship=0;ship<(nbShipsAttacker-nbShipsDefendant);ship++){
-						//Ajouter le vaisseau
-						Ship newShip = this.ships.getFirst();
-						this.ships.removeFirst();
-						newShip.setPosition(xTarget,yTarget);//A changer une fois que l'initialisation des vaisseaux sera faite
-						systemToInvade.getShipsOnHex().add(newShip);
-					}
-					if(systemToInvade.isTriPrime()){
-						this.setControllsTriPrime(true);
-					}
-				}
-
-				if (result.equals("Le gagnant est le défendant : il continue de contrôler le système attaqué.") && systemToInvadeFrom.isTriPrime()) {
-					this.setControllsTriPrime(false);
-				}
 			}
 
 			/**
@@ -742,6 +845,17 @@ public class Player {
 
 	}
 
+	private Ship getFirstShipNotPlaced() {
+		for (int i=0; i<this.ships.size(); i++){
+			if(!this.ships.get(i).isPlaced()){
+				return this.ships.get(i);
+			}
+		}
+		System.out.println(this.ships);
+		System.out.println("Pas de ships restants");
+		return null;
+	}
+
 	public boolean isEliminated() {
 		return ships.isEmpty();
 	}
@@ -750,7 +864,7 @@ public class Player {
 	public String toString() {
 		return "État actuel de " + this.name + ":\n"
 				+ "- Hexs contrôlés: " + this.controlledHexs + "\n"
-				+ "- Contrôle le Tri Prime: " + this.controllsTriPrime;
+				+ "- Contrôle le Tri Prime: " + this.controllsTriPrime + "\n";
 	}
 
 

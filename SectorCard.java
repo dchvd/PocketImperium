@@ -141,16 +141,16 @@ public class SectorCard {
 	public int calculateScore(Player player, int i) {
 		int score=0;
 		for(Hex currentHex : this.hexes) {
-			System.out.println(currentHex);
-			System.out.println("Controllé : " + currentHex.isControlled());
+			//System.out.println(currentHex);
+			//System.out.println("Controllé : " + currentHex.isControlled());
 			if (currentHex.isControlled()) {
-				System.out.println(" et par : " + currentHex.getControlledBy().getName());
-				System.out.println("Celui du joueur en train d'etre testé : " + player.getId());
-				System.out.println("Celui du joueur qui contrôle le currentHex : " + currentHex.getControlledBy().getId());
+				//System.out.println(" et par : " + currentHex.getControlledBy().getName());
+				//System.out.println("Celui du joueur en train d'etre testé : " + player.getId());
+				//System.out.println("Celui du joueur qui contrôle le currentHex : " + currentHex.getControlledBy().getId());
 
 				if(player.getId()==currentHex.getControlledBy().getId()) { //player.getControlledHexs().contains(currentHex)
 					score+= i*currentHex.getValue();
-					System.out.println("valeur du hex : " + currentHex.getValue());
+					//System.out.println("valeur du hex : " + currentHex.getValue());
 				}
 			}
 		}

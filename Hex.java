@@ -52,8 +52,12 @@ public class Hex {
 	}
 
 	public void setControlledBy(Player controlledBy) {
-		this.controlled=true;
 		this.controlledBy = controlledBy;
+		if (controlledBy==null) {
+			this.controlled=false;
+		}else{
+			this.controlled=true;
+		}
 	}
 	public void setCoordinates(int x, int y) {
 		this.xPosition = x;
@@ -62,14 +66,9 @@ public class Hex {
 
 	@Override
 	public String toString() {
-		/**return "Hex{" +
-		 " x='" + xPosition + '\'' +
-		 " y='" + yPosition + '\'' +
-		 " value='" + value + '\'' +
-		 " nb_vaisseaux='"+this.shipsOnHex.size()+'\''+
-		 '}';**/
 		String shipsInString = "*".repeat(this.shipsOnHex.size());
-		return " { x=" + xPosition + "y=" + yPosition + "| systLevel=" + value + "ships="+ shipsInString +"}";
+		return " { x=" + xPosition + "y=" + yPosition + "| systLevel=" + value + " ships="+ shipsInString +"}";
+
 	}
 
 	public int getxPosition() {
@@ -84,9 +83,15 @@ public class Hex {
 	public ArrayList<Ship> getShipsOnHex() {
 		return shipsOnHex;
 	}
+
 	public void setShipsOnHex(ArrayList<Ship> shipsOnHex) {
 		this.shipsOnHex = shipsOnHex;
 	}
+
+	public void addShipOnHex(Ship shipToAdd){
+		this.shipsOnHex.add(shipToAdd);
+	}
+
 	public int getValue() {
 		return value;
 	}

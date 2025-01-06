@@ -70,11 +70,7 @@ public class Helper {
 	 * @return true si il est occupé, false sinon
 	 */
 	public static boolean TestOccupationHex(Hex hex) {
-		if(hex.getControlledBy()==null) {
-			return false;
-		}else {
-			return true;
-		}
+        return hex.getControlledBy() != null;
 	}
 
 	/**
@@ -222,5 +218,14 @@ public class Helper {
 			}
 		}
 		return neighboursOwnedByPlayer;
+	}
+
+	public static boolean TestOccupationPlayerCard(SectorCard chosenCard, Player player) {
+		for(Hex hexActuel: chosenCard.getHexes()){
+			if (hexActuel.getControlledBy() == player) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

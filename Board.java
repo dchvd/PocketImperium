@@ -9,7 +9,6 @@ import java.lang.Math;
 public class Board {
 	//board est composé des sectorCards, il permettra notamment de compter les scores
 	private SectorCard[][] board = new SectorCard[3][3];
-	//private String name;
 	//gameBoard sera la grille de Hex que l'on utilise pour les fonctions expand, exterminate et explore
 	public static List<List<Hex>> gameBoard = new ArrayList<>();
 
@@ -157,16 +156,21 @@ public class Board {
 		return this.gameBoard;
 	}
 
-	public boolean verifyCapability(Hex choosedHex) {
+	public boolean verifyCapability(Hex choosedHex, boolean virtual) {
 		if (choosedHex.isSystemHex1()==false) {
-			System.out.println("Ce hex ne contient pas de système de niveau 1");
+			if(!virtual) {
+				System.out.println("Ce hex ne contient pas de système de niveau 1");
+			}
 			return false;
 		}
 		for (SectorCard[] rangee: this.board) {
 			for (SectorCard card : rangee) {
 				if (card.getHexes().contains(choosedHex)) {
-					System.out.println("Hex trouvé dans le secteur Carte");
-					if (!card.getIsAlreadyChosen()){
+
+                    if (!virtual) {
+                        System.out.println("Hex trouvé dans le secteur Carte");
+                    }
+                    if (!card.getIsAlreadyChosen()){
 						card.isChoosed();
 						return true;
 					}else {

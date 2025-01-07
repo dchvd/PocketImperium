@@ -45,19 +45,12 @@ public class Partie {
     	this.initialisation(sc);
 		for (int i = 0; i < 9; i++) {
 			this.Tour(this.gameBoard, sc);
+			if(this.finPartie(this.tour)){
+				break;
+			}
 		}
-		//System.out.println("\n \n ------ Choix des secteurs sur lesquels gagner des points ! ------");
-		//this.calcScore(sc, 1); // sera pas ici à la fin
-		// ne pas oublier que quand c'est le dernier tour c'est pas calcScore qui est appelé mais finalCalcScore
-    	//
-    	/*
-        while (!finPartie()) {
-        	System.out.println("------ Tour suivant ! ------");
-            this.Tour();
-            this.tour++;
-        }*/
-        //declareWinner();
-		//System.out.println("------ Fin de la partie / Mise en Pause ! ------");
+		declareWinner();
+		System.out.println("------ Fin de la partie ------");
     }
     
     private void initialisation(Scanner sc) {
@@ -94,7 +87,7 @@ public class Partie {
 					}
 				}else{
 					System.out.println(player.getName()+" est entrain de choisir un secteur à habiter...");
-					int x=(int)(Math.random()*9);
+					int x=(int)(Math.random()*9); // TODO remplacer
 					int y = (int)(Math.random()*5);
 					Hex choosedHex=this.gameBoard.gameBoard.get(x).get(y);
 					while(!this.gameBoard.verifyCapability(choosedHex, player.isVirtual())) {
@@ -299,15 +292,14 @@ public class Partie {
 		//Les actions de chaque joueur sont realisées
 		this.perform(board);
 
+		// Maintenance des vaisseaux
+		this.sustainShips(sc);
 		//Choix de secteurs pour le calcul des scores
 		if(this.tour<8){
 			this.calcScore(sc, 1);
 		}else{
 			this.calcScore(sc, 2);
 		}
-		//TODO
-		this.sustainShips(sc);
-
 		//Changement de start player
 		this.endOfRound();
 	}
@@ -335,12 +327,17 @@ public class Partie {
 		for (Player player : this.players) {
 			while (true) {
 				// vérification qu'il reste des secteurs disponibles
+				if(chosenSectors.size()!=0){
+					System.out.println("Secteurs choisis" + chosenSectors);
+				}else{
+					System.out.println("Aucun secteurs choisis pour l'instant");
+				}
 				plusDeSecteurs=true;
 				for (SectorCard[] rangee: this.gameBoard.getBoard()) {
 					for (SectorCard card : rangee) {
 						for (Hex hex : card.getHexes()){
 							if (hex.isControlled()){
-								if (!chosenSectors.contains(card) && !(hex.getControlledBy().equals(player))) {
+								if (!hex.isTriPrime() && !chosenSectors.contains(card) && (hex.getControlledBy().equals(player))) {
 									plusDeSecteurs=false;
 									break;
 								}
@@ -359,7 +356,6 @@ public class Partie {
 				}else if (actualSector.getIsTriPrime()) {
 					System.out.println("Ce secteur est le TriPrime, qui ne peut pas être choisi, veuillez recommencer");
 				}else{
-					System.out.println("Arrivé ici");
 					break;
 				}
 			}
@@ -452,10 +448,10 @@ public class Partie {
 		}else if(idGagnant==2 && idDernier==0) {
 			idSecond = 1;
 		}
-		System.out.println("Fin du jeu ! \n Le gagnant est : "+ this.players.get(idGagnant).getName());
-		System.out.println("Le podium des scores est :\n---- 1er : " + this.players.get(idGagnant).getName() + " Avec un score de " + scores[idGagnant]);
-		System.out.println(" ---- 2er : " + this.players.get(idSecond).getName() + " Avec un score de " + scores[idSecond]);
-		System.out.println(" ----  3eme : " + this.players.get(idDernier).getName() + " Avec un score de " + scores[idDernier]);
+		System.out.println("\n \n--------------------- Fin du jeu ! ---------------------\nLe gagnant est : "+ this.players.get(idGagnant).getName());
+		System.out.println("Le podium des scores est :\n ---- 1er : " + this.players.get(idGagnant).getName() + " Avec un score de " + scores[idGagnant]);
+		System.out.println("   ---- 2er : " + this.players.get(idSecond).getName() + " Avec un score de " + scores[idSecond]);
+		System.out.println("     ---- 3eme : " + this.players.get(idDernier).getName() + " Avec un score de " + scores[idDernier]);
 
 	}
 
@@ -466,11 +462,13 @@ public class Partie {
 		Partie partie=new Partie(scanner); //Création de la partie --> les joueurs s'enregistrent + initialisation
 		//partie.startGame(scanner);//début de la partie --> initialisation
 		//Jeu
-		for(int tour=1;tour<9;tour++) {
+		for (int tour=0;tour<9;tour++) {
 			boolean finPartie = partie.finPartie(tour);
-			while(!finPartie) {
-				partie.Tour(board, scanner);
+			if (finPartie) {
+				break;
 			}
+			partie.Tour(board, scanner);
+
 		}
 		//On détermine le gagnant
 		partie.declareWinner();

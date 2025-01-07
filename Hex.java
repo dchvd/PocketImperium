@@ -52,11 +52,17 @@ public class Hex {
 	}
 
 	public void setControlledBy(Player controlledBy) {
+		if (this.isTriPrime() && this.controlledBy != null) {
+			this.controlledBy.setControllsTriPrime(false);
+		}
 		this.controlledBy = controlledBy;
 		if (controlledBy==null) {
 			this.controlled=false;
 		}else{
 			this.controlled=true;
+			if(this.isTriPrime()){
+				controlledBy.setControllsTriPrime(true);
+			}
 		}
 	}
 	public void setCoordinates(int x, int y) {

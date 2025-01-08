@@ -37,6 +37,17 @@ public class Ship implements Serializable {
 	public boolean isPlaced() {
 		return placedOnBoard;
 	}
+	public int getxPosition() {
+		return xPosition;
+	}
+
+	public int getyPosition() {
+		return yPosition;
+	}
+
+	public Player getOwner() {
+		return owner;
+	}
 
 	public String getOwnerName() {
 		return owner.getName();

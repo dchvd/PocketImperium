@@ -644,14 +644,15 @@ public class Player implements Serializable {
 					}catch(Exception e){
 						System.out.println("Les coordonnées ne sont pas valides.");
 					}
-					if(systemToInvadeFrom==null){
-						continue;
-					}
+
 					while (!Helper.TestOccupationPlayerHex(systemToInvadeFrom, this)) {
 						if(firstSystemToInvade!=null){
 							if(!Helper.findSystemNeighbours(firstSystemToInvade, board).contains(systemToInvadeFrom)){
 								System.out.println("Ce hex n'est pas voisin de celui que vous allez envahir.");
-							}else{
+							}else if(xInvadeFrom==firstSystemToInvade.getxPosition() && yInvadeFrom == firstSystemToInvade.getyPosition()){
+								System.out.println("Vous ne pouvez pas vous attaquer vous-même.");
+							}
+							else{
 								break;
 							}
 						}
@@ -672,7 +673,6 @@ public class Player implements Serializable {
 						for (Hex hex : neighbours) {
 							System.out.println("Système (" + hex.getxPosition() + ", " + hex.getyPosition() + ")");
 						}
-
 					}
 
 					//re attaquer :
@@ -698,7 +698,7 @@ public class Player implements Serializable {
 							systemToInvade = Board.gameBoard.get(xInvade).get(yInvade);
 						}
 					}else{
-						System.out.println("Vous allez attaque : " + firstSystemToInvade);
+						System.out.println("Vous allez attaquer : " + firstSystemToInvade);
 						systemToInvade = firstSystemToInvade;
 						xInvade = systemToInvade.getxPosition();
 						yInvade = systemToInvade.getyPosition();
@@ -715,17 +715,17 @@ public class Player implements Serializable {
 						scanner.nextLine();
 					}
 
-					//Supprimer les vaisseaux du système à partir duquel on a attaqué
-					for (int index = 0; index < nbShipsAttacker; index++) {
-						systemToInvadeFrom.getShipsOnHex().getFirst().destroyShip();
-						systemToInvadeFrom.getShipsOnHex().removeFirst();
-					}
-
 					if(nbShipsAttacker==systemToInvadeFrom.getShipsOnHex().size()) { //cas où tous les vaisseaux de l'attaquant sont utilisés
 						this.getControlledHexs().remove(systemToInvadeFrom);
 						//systemToInvadeFrom.getShipsOnHex().clear();
 						systemToInvadeFrom.setControlledBy(null);
 						systemToInvadeFrom.setControlled(false);
+					}
+
+					//Supprimer les vaisseaux du système à partir duquel on a attaqué
+					for (int index = 0; index < nbShipsAttacker; index++) {
+						systemToInvadeFrom.getShipsOnHex().getFirst().destroyShip();
+						systemToInvadeFrom.getShipsOnHex().removeFirst();
 					}
 
 					//Déterminer le gagnant
@@ -754,6 +754,9 @@ public class Player implements Serializable {
 					//Vérifier les hexs voisins appartenant à l'attaquant
 					ArrayList<Hex> attackerNeighbours = Helper.findNeighboursOwnedByPlayer(systemToInvade, this, board);
 					if (!attackerNeighbours.isEmpty()) {
+						if(attackerNeighbours.size()==1 && attackerNeighbours.get(0).getControlledBy().equals(this)){
+							break;
+						}
 						System.out.println("Hexs voisins que vous contrôlez et pouvez utiliser pour attaquer à nouveau :");
 						for (Hex hex : attackerNeighbours) {
 							System.out.println("Hex (" + hex.getxPosition() + ", " + hex.getyPosition() + ")");
@@ -763,7 +766,11 @@ public class Player implements Serializable {
 						System.out.println("Souhaitez-vous attaquer à nouveau ce système ? (oui/non)");
 						String answer = scanner.nextLine();
 						if (!answer.equalsIgnoreCase("oui")) {
+							this.firstSystemToInvade=null;
 							continueAttack = false;
+						}else if(answer.equalsIgnoreCase("oui")){
+							this.firstSystemToInvade = systemToInvade;
+							continueAttack = true;
 						}
 					} else {
 						System.out.println("Aucun hex voisin contrôlé pour attaquer à nouveau.");
@@ -857,10 +864,12 @@ public class Player implements Serializable {
 					if (result.equals("Le gagnant est le défendant : il continue de contrôler le système attaqué.") && systemToInvadeFrom.isTriPrime()) {
 						this.setControllsTriPrime(false);
 					}
-					if(result.equals("Le gagnant est le défendant : il continue de contrôler le système attaqué.")){
-						//Vérifier les hexs voisins appartenant à l'attaquant
+											//Vérifier les hexs voisins appartenant à l'attaquant
 						ArrayList<Hex> attackerNeighbours = Helper.findNeighboursOwnedByPlayer(systemToInvade, this, board);
 						if (!attackerNeighbours.isEmpty()) {
+							if(attackerNeighbours.size()==1 && attackerNeighbours.get(0).getControlledBy().equals(this)){
+								break;
+							}
 							int attaqueOuPas = random.nextInt(3);
 							if(attaqueOuPas==1){
 								System.out.println("Le joueur décide de ré attaquer! ");
@@ -874,7 +883,7 @@ public class Player implements Serializable {
 							System.out.println("Aucun hex voisin contrôlé pour attaquer à nouveau.");
 							continueAttack = false;
 						}
-					}
+
 					if(this.controlledHexs.isEmpty()){
 						continueAttack= false;
 					}

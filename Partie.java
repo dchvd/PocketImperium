@@ -92,9 +92,9 @@ public class Partie implements Serializable {
     		while(true) {
 				if(!player.isVirtual()){
 					System.out.println(player.getName()+ " : choisissez le système à habiter"
-							+ "\n Entrez le x du Hex choisi ");
+							+ "\n Entrez le x du Hex choisi : ");
 					int x = sc.nextInt();
-					System.out.println("Entrez le y du hex choisi.");
+					System.out.println("Entrez le y du hex choisi : ");
 					int y=sc.nextInt();
 					if(x>9 || x<0 || y>5 || y<0){
 						System.out.println("Le hex n'est pas valide (x doit être entre 0 et 8 et y entre 0 et 5");

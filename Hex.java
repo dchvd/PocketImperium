@@ -1,12 +1,13 @@
 package pocket_imperium;
 
 import java.util.ArrayList;
-import java.util.List;
-
+import java.io.*;
+import java.util.*;
 /**
  * La classe Hex permet de déterminer les différents Hex de la carte
  */
-public class Hex {
+public class Hex implements Serializable {
+	private static final long serialVersionUID = 1L;
 	private int xPosition;
 	private int yPosition;
 	private ArrayList<Ship> shipsOnHex = new ArrayList<Ship>();

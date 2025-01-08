@@ -1,11 +1,14 @@
 package pocket_imperium;
 
+import java.io.Serializable;
 import java.util.*;
+import java.io.*;
 
 /**
  * La classe Partie permet de gérer le déroulement d'une partie de Imperium Pocket.
  */
-public class Partie {
+public class Partie implements Serializable {
+	private static final long serialVersionUID = 1L;
 	/**
 	 * La liste des Joueurs permet d'enregistrer les différents joueurs qui vont la partie de Imperium Pocket
 	 */
@@ -18,7 +21,7 @@ public class Partie {
     
     //Génère le plateau :
     private Board gameBoard = new Board();
-    
+    private boolean isPaused = false;
     /**
      * Le constructeur Partie permet de créer une partie du jeu Imperium Pocket
      * @param sc scanner pour récupérer les informations données par le joueur
@@ -34,24 +37,51 @@ public class Partie {
     	this.players.add(new Player(sc,2, availableColors));
     	this.startGame(sc);
     }
-    
-    /**
-     * La fonction startGame permet de lancer la partie
-     */
-    public void startGame(Scanner sc) {
-		System.out.println("Le plateau est : ");
+
+
+	public void resumeGame(Scanner sc) {
+		System.out.println("Reprise de la partie au tour " + (this.tour + 1));
+		System.out.println("État actuel du plateau :");
 		this.gameBoard.printBoard();
-    	System.out.println("------------------------------------ Initialisation ! ------------------------------------");
-    	this.initialisation(sc);
-		for (int i = 0; i < 9; i++) {
+		System.out.println("------------------------------------ Reprise ! ------------------------------------");
+
+		// Continue the game from the current tour
+		for (int i = this.tour; i < 9; i++) {
 			this.Tour(this.gameBoard, sc);
 			if(this.finPartie(this.tour)){
 				break;
 			}
 		}
-		declareWinner();
-		System.out.println("------ Fin de la partie ------");
-    }
+
+		if (this.isPaused == false) {
+			this.declareWinner();
+			System.out.println("------ Fin de la partie ------");
+		}
+	}
+
+
+    /**
+     * La fonction startGame permet de lancer la partie
+     */
+    public void startGame(Scanner sc) {
+		if (this.tour ==0){
+			System.out.println("Le plateau est : ");
+			this.gameBoard.printBoard();
+			System.out.println("------------------------------------ Initialisation ! ------------------------------------");
+			this.initialisation(sc);
+		}
+
+		for (int i = this.tour; i < 9; i++) {
+			this.Tour(this.gameBoard, sc);
+			if(this.finPartie(this.tour)){
+				break;
+			}
+		}
+		if (!this.isPaused) {
+			this.declareWinner();
+			System.out.println("------ Fin de la partie ------");
+		};
+	}
     
     private void initialisation(Scanner sc) {
 		Random random = new Random();
@@ -266,13 +296,48 @@ public class Partie {
     /**
      * La methode endOfRound permet d'echanger les places du premier et du dernier joueur de la liste, afin que le dernier joueur de la liste devienne le Start Player
      */
-   public void endOfRound() {
+   public void endOfRound(Scanner sc) {
 	   Player startPlayer = this.players.getFirst();
 	   Player newStartPlayer=this.players.getLast();
 	   this.players.removeFirst();
 	   this.players.removeLast();
 	   this.players.addFirst(newStartPlayer);
 	   this.players.addLast(startPlayer);
+	   boolean validInput = false;
+	   while (!validInput) {
+		   System.out.println(" \n \n " +
+				   "Voulez vous faire une pause? Tapez 'oui' ou 'non' : ");
+		   try {
+			   String choix = sc.nextLine().toLowerCase(); // Convert to lowercase for easier comparison
+			   if (choix.equals("oui") || choix.equals("1")) {
+				   System.out.println("Mise en pause");
+				   validInput = true;
+				   isPaused=true;
+				   // Save current game state
+				   try {
+					   FileOutputStream fos = new FileOutputStream("currentGame.dat");
+					   ObjectOutputStream oos = new ObjectOutputStream(fos);
+					   oos.writeObject(this);
+					   oos.close();
+					   fos.close();
+					   System.out.println("Partie sauvegardée avec succès!");
+				   } catch (IOException e) {
+					   System.out.println("Erreur lors de la sauvegarde : " + e.getMessage());
+				   }
+				   // Return to menu by ending the current game loop
+				   return;
+			   } else if (choix.equals("non") || choix.equals("0")) {
+				   System.out.println("La partie continue !");
+				   validInput = true;
+
+				   // Continue with the game
+			   } else {
+				   System.out.println("Entrée invalide. Veuillez taper 'oui' ou 'non' (ou '1' ou '0')");
+			   }
+		   } catch (Exception e) {
+			   System.out.println("Mauvaise saisie, veuillez réessayer");
+		   }
+	   }
    }
         	
         		
@@ -301,7 +366,7 @@ public class Partie {
 			this.calcScore(sc, 2);
 		}
 		//Changement de start player
-		this.endOfRound();
+		this.endOfRound(sc);
 	}
 
 	private void sustainShips(Scanner sc) {
@@ -310,7 +375,7 @@ public class Partie {
 			for (Hex hexActuel: rangee) {
 				if (hexActuel.isControlled()){ // peut être enlevé
 					while (hexActuel.getNbMaxShips()< hexActuel.getShipsOnHex().size()) {
-						System.out.println("Le ship de " + hexActuel.getShipsOnHex().get(0).getOwnerName() + " en x=" + hexActuel.getxPosition() + ", y=" + hexActuel.getyPosition() + " n'a pas survécu"); //TODO meilleur affichage
+						System.out.println("Le vaisseau de " + hexActuel.getShipsOnHex().get(0).getOwnerName() + " en x=" + hexActuel.getxPosition() + ", y=" + hexActuel.getyPosition() + " n'a pas survécu"); //TODO meilleur affichage
 						Ship shipSupp = hexActuel.getShipsOnHex().removeLast();
 						shipSupp.destroyShip();
 					}
@@ -321,6 +386,10 @@ public class Partie {
 
 	public void calcScore(Scanner sc, int scoring) {
 		System.out.println("-------------- Calcul des scores --------------");
+		System.out.println("-------------- Rappel des secteurs controlés par les joueurs --------------");
+		for(Player player : players){
+			System.out.println(player);
+		}
 		ArrayList <SectorCard> chosenSectors=new ArrayList <SectorCard>();
 		SectorCard actualSector = null;
 		boolean plusDeSecteurs=false;
@@ -412,7 +481,8 @@ public class Partie {
      */
     private boolean finPartie(int tour) {
 		boolean isEliminated = players.stream().anyMatch(Player::isEliminated);
-		return isEliminated || tour > 9;
+
+		return isPaused || isEliminated || tour > 9;
 	}
 
     

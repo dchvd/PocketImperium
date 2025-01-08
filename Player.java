@@ -1,11 +1,13 @@
 package pocket_imperium;
+import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 
-public class Player {
+public class Player implements Serializable {
+	private static final long serialVersionUID = 1L;
 	private String name;
 	private GameStrategy strategy;
 	private Color couleur;
@@ -528,15 +530,20 @@ public class Player {
 				}
 			}else{ // choix du joueur virtuel
 				//Choix d'un hex duquel il veut partir au hasard
-				System.out.println("Le joueur"+ this.getName() + " choisit le hex d'où il veut partir...");
+				System.out.println("Le joueur  "+ this.getName() + " choisit le hex d'où il veut partir...");
 				Hex hexDeparture=this.controlledHexs.get(random.nextInt(controlledHexs.size()));
 				int xDeparture= hexDeparture.getxPosition();
 				int yDeparture= hexDeparture.getyPosition();
 
 				//Définir le hex où le joueur virtuel veut aller
 				System.out.println("Le joueur virtuel choisit le hex où il veut aller...");
-				int xDestination = (int)(Math.random()*9);
-				int yDestination = (int)(Math.random()*5);
+				int xDestination=random.nextInt(9);
+				int yDestination;
+				if(xDestination %2==0){
+					yDestination = random.nextInt(6);
+				}else{
+					yDestination = random.nextInt(5);
+				}
 				Hex hexDestination = Board.gameBoard.get(xDestination).get(yDestination);
 
 				boolean hexOccupied=Helper.TestOccupationHex(hexDestination); //tester si le hex est occupé
@@ -547,7 +554,7 @@ public class Player {
 					nbEssais++;
 					xDestination = random.nextInt(9);
 					if(xDestination %2==0){
-						xDestination = random.nextInt(6);
+						yDestination = random.nextInt(6);
 					}else{
 						yDestination = random.nextInt(5);
 					}

@@ -1,12 +1,14 @@
 package pocket_imperium;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.lang.Math;
 
-public class Board {
+public class Board implements Serializable {
+	private static final long serialVersionUID = 1L;
 	//board est composé des sectorCards, il permettra notamment de compter les scores
 	private SectorCard[][] board = new SectorCard[3][3];
 	//gameBoard sera la grille de Hex que l'on utilise pour les fonctions expand, exterminate et explore

@@ -1,6 +1,8 @@
 package pocket_imperium;
+import java.io.*;
 
-public class Ship {
+public class Ship implements Serializable {
+	private static final long serialVersionUID = 1L;
 
 	//Attributs
 	private Player owner;

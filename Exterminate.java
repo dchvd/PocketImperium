@@ -108,9 +108,6 @@ public class Exterminate{
 			if (systemToInvade.getShipsOnHex() != null) {
 				systemToInvade.getShipsOnHex().clear();
 			}
-			if (systemToInvadeFrom.getShipsOnHex() != null) {
-				systemToInvadeFrom.getShipsOnHex().clear();
-			}
 
 			// Retirer le contrôle de l'attaquant sur l'hex de départ
 			attacker.getControlledHexs().remove(systemToInvadeFrom);

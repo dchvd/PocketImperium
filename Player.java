@@ -160,7 +160,7 @@ public class Player implements Serializable {
 			System.out.println("Le joueur virtuel a choisi le secteur : x = " + x + " y=" + y + "!");
 			return chosenCard;
 		}
-    }
+	}
 
 
 	/**
@@ -610,6 +610,7 @@ public class Player implements Serializable {
 		boolean response=true; //permet au joueur de choisir autant de hexs qu'il souhaite pour attaquer
 		boolean systemToAttackChoosed=false; //permet de savoir si le joueur a deja choisi le hex a attaquer ou non
 		Hex systemToInvade = null; //hex à attaquer
+		boolean isTriPrime; //Vérifier
 		Random random = new Random();
 
 		this.firstSystemToInvade=null;
@@ -649,12 +650,12 @@ public class Player implements Serializable {
 						if(firstSystemToInvade!=null){
 							if(!Helper.findSystemNeighbours(firstSystemToInvade, board).contains(systemToInvadeFrom)){
 								System.out.println("Ce hex n'est pas voisin de celui que vous allez envahir.");
-							}else if(xInvadeFrom==firstSystemToInvade.getxPosition() && yInvadeFrom == firstSystemToInvade.getyPosition()){
-								System.out.println("Vous ne pouvez pas vous attaquer vous-même.");
-							}
-							else{
+							}else{
 								break;
 							}
+						}
+						if(xInvadeFrom==firstSystemToInvade.getxPosition() && yInvadeFrom == firstSystemToInvade.getyPosition()){
+							System.out.println("Vous ne pouvez pas vous attaquer vous-même.");
 						}
 						System.out.println("Vous ne contrôlez pas ce système. Réessayez.");
 						System.out.print("Entrez le x : ");
@@ -671,8 +672,15 @@ public class Player implements Serializable {
 					if (firstSystemToInvade == null){
 						System.out.println("Voici les systèmes voisins que vous pouvez attaquer :");
 						for (Hex hex : neighbours) {
-							System.out.println("Système (" + hex.getxPosition() + ", " + hex.getyPosition() + ")");
+							if(!this.controllsTriPrime){
+								System.out.println("Système (" + hex.getxPosition() + ", " + hex.getyPosition() + ")");
+							}else{
+								if(!hex.isTriPrime()){
+									System.out.println("Système (" + hex.getxPosition() + ", " + hex.getyPosition() + ")");
+								}
+							}
 						}
+
 					}
 
 					//re attaquer :
@@ -688,6 +696,7 @@ public class Player implements Serializable {
 						scanner.nextLine();
 						System.out.println("xInvade = "+ xInvade + " et yInvade =" + yInvade);
 						systemToInvade = Board.gameBoard.get(xInvade).get(yInvade);
+						isTriPrime=systemToInvade.isTriPrime();
 						while (!neighbours.contains(systemToInvade) || Helper.TestOccupationPlayerHex(systemToInvade, this)) {
 							System.out.println("Système invalide. Choisissez un voisin non contrôlé par vous.");
 							System.out.print("Entrez le x : ");
@@ -696,12 +705,14 @@ public class Player implements Serializable {
 							yInvade = scanner.nextInt();
 							scanner.nextLine();
 							systemToInvade = Board.gameBoard.get(xInvade).get(yInvade);
+							isTriPrime=systemToInvade.isTriPrime();
 						}
 					}else{
 						System.out.println("Vous allez attaquer : " + firstSystemToInvade);
 						systemToInvade = firstSystemToInvade;
 						xInvade = systemToInvade.getxPosition();
 						yInvade = systemToInvade.getyPosition();
+						isTriPrime=systemToInvade.isTriPrime();
 					}
 
 
@@ -729,7 +740,12 @@ public class Player implements Serializable {
 					}
 
 					//Déterminer le gagnant
-					nbShipsDefendant = systemToInvade.getShipsOnHex().size();
+					if(!isTriPrime){ //cas où l'attaquant attaque un systeme qui n'est pas TriPrime
+						nbShipsDefendant = systemToInvade.getShipsOnHex().size();
+					}else { //cas où l'attaquant attaque le TriPrime
+						nbShipsDefendant = Helper.nbShipsOnTriPrime();
+					}
+						//nbShipsDefendant = systemToInvade.getShipsOnHex().size();
 					String result = Exterminate.DetermineWinner(nbShipsAttacker, nbShipsDefendant, systemToInvade, systemToInvadeFrom, this);
 					System.out.println(result);
 
@@ -737,8 +753,8 @@ public class Player implements Serializable {
 						for(int ship=0;ship<(nbShipsAttacker-nbShipsDefendant);ship++){
 							//Ajouter le(s) vaisseau(x) du gagnant au Hex capturé
 							Ship newShip = this.getFirstShipNotPlaced();
-                            assert newShip != null;
-                            newShip.setPosition(xInvade,yInvade);
+							assert newShip != null;
+							newShip.setPosition(xInvade,yInvade);
 							systemToInvade.addShipOnHex(newShip);
 						}
 
@@ -797,9 +813,17 @@ public class Player implements Serializable {
 
 					// Filtrer les voisins pour exclure ceux déjà contrôlés par le joueur
 					ArrayList<Hex> attackableSystems = new ArrayList<>();
-					for (Hex neighbour : systemNeighbours) {
-						if (!this.controlledHexs.contains(neighbour)) {
-							attackableSystems.add(neighbour);
+					if(!systemToInvadeFrom.isTriPrime()){
+						for (Hex neighbour : systemNeighbours) {
+							if (!this.controlledHexs.contains(neighbour)) {
+								attackableSystems.add(neighbour);
+							}
+						}
+					}else{
+						for(Hex neighbour:systemNeighbours){
+							if((!this.controlledHexs.contains(neighbour))||(!neighbour.isTriPrime())){
+								attackableSystems.add(neighbour);
+							}
 						}
 					}
 
@@ -821,8 +845,8 @@ public class Player implements Serializable {
 						systemToInvade = firstSystemToInvade;
 						xTarget = systemToInvade.getxPosition();
 						yTarget = systemToInvade.getyPosition();
-
 					}
+					isTriPrime=systemToInvade.isTriPrime();
 
 					//Déterminer le nombre de vaisseaux à utiliser
 					System.out.println("Le joueur virtuel choisit combien de vaisseaux utiliser pour attaquer...");
@@ -841,7 +865,11 @@ public class Player implements Serializable {
 					System.out.println("Nombre de vaisseaux choisis pour l'attaque : " + nbShipsToAttack);
 
 					// Nombre de vaisseaux défendant
-					nbShipsDefendant = systemToInvade.getShipsOnHex().size();
+					if(!isTriPrime){ //cas où l'attaquant attaque un systeme qui n'est pas TriPrime
+						nbShipsDefendant = systemToInvade.getShipsOnHex().size();
+					}else{ //cas où l'attaquant attaque le TriPrime
+						nbShipsDefendant=Helper.nbShipsOnTriPrime();
+					}
 
 					// Exécuter l'attaque
 					System.out.println("Le joueur virtuel attaque avec " + nbShipsToAttack + " vaisseaux contre " + nbShipsDefendant + " vaisseaux.");
@@ -864,12 +892,10 @@ public class Player implements Serializable {
 					if (result.equals("Le gagnant est le défendant : il continue de contrôler le système attaqué.") && systemToInvadeFrom.isTriPrime()) {
 						this.setControllsTriPrime(false);
 					}
-											//Vérifier les hexs voisins appartenant à l'attaquant
+					if(result.equals("Le gagnant est le défendant : il continue de contrôler le système attaqué.")){
+						//Vérifier les hexs voisins appartenant à l'attaquant
 						ArrayList<Hex> attackerNeighbours = Helper.findNeighboursOwnedByPlayer(systemToInvade, this, board);
 						if (!attackerNeighbours.isEmpty()) {
-							if(attackerNeighbours.size()==1 && attackerNeighbours.get(0).getControlledBy().equals(this)){
-								break;
-							}
 							int attaqueOuPas = random.nextInt(3);
 							if(attaqueOuPas==1){
 								System.out.println("Le joueur décide de ré attaquer! ");
@@ -883,28 +909,27 @@ public class Player implements Serializable {
 							System.out.println("Aucun hex voisin contrôlé pour attaquer à nouveau.");
 							continueAttack = false;
 						}
-
+					}
 					if(this.controlledHexs.isEmpty()){
 						continueAttack= false;
 					}
 				}
-
 			}
 
 			/**
-			//Construit l'action
-			for (int j=0;j<systemsToInvadeFrom.size();j++) {
-				Hex systemToInvadeFrom=systemsToInvadeFrom.get(j);
-				//Exterminate exterminate=new Exterminate(systemToInvade, systemToInvadeFrom, nbShipsAttacker, nbShipsDefendant, this); --> Potentiellement inutile ?
+			 //Construit l'action
+			 for (int j=0;j<systemsToInvadeFrom.size();j++) {
+			 Hex systemToInvadeFrom=systemsToInvadeFrom.get(j);
+			 //Exterminate exterminate=new Exterminate(systemToInvade, systemToInvadeFrom, nbShipsAttacker, nbShipsDefendant, this); --> Potentiellement inutile ?
 
-				//Bouge les vaisseaux du système à partir duquel on attaque
-				Helper.removeShipsFromHex(nbShipsAttacker, systemToInvadeFrom);
-			}
-			//Détermine le gagnant
-			System.out.println(Exterminate.DetermineWinner(nbShipsAttacker, nbShipsDefendant, systemToInvade, systemToInvadeFrom,this));
+			 //Bouge les vaisseaux du système à partir duquel on attaque
+			 Helper.removeShipsFromHex(nbShipsAttacker, systemToInvadeFrom);
+			 }
+			 //Détermine le gagnant
+			 System.out.println(Exterminate.DetermineWinner(nbShipsAttacker, nbShipsDefendant, systemToInvade, systemToInvadeFrom,this));
 
-			//Résumer les informations du joueur
-			System.out.println(this.toString());**/
+			 //Résumer les informations du joueur
+			 System.out.println(this.toString());**/
 		}
 
 	}
@@ -934,4 +959,3 @@ public class Player implements Serializable {
 
 	//public boolean isWinner() {
 }
-

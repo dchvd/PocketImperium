@@ -3,9 +3,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * La classe Helper fournit des méthodes utiles pour le jeu.
+ * Ces méthodes incluent entre autre la gestion des hexs, des vaisseaux, et des systèmes du plateau de jeu.
+ */
 
 public class Helper {
 
+	/**
+	 * Place les systèmes sur le plateau en fonction du type de carte spécifié.
+	 *
+	 * @param typeCarte Le type de carte ("ExteriorCard" ou "MiddleExteriorCard").
+	 * @return Un tableau contenant les coordonnées des systèmes placés.
+	 */
 	public static int[][] placeSystems (String typeCarte) {
 		Random randomNumbers = new Random();
 		int empPossible;
@@ -70,7 +80,7 @@ public class Helper {
 	 * @return true si il est occupé, false sinon
 	 */
 	public static boolean TestOccupationHex(Hex hex) {
-        return hex.getControlledBy() != null;
+		return hex.getControlledBy() != null;
 	}
 
 	/**
@@ -104,7 +114,6 @@ public class Helper {
 		hex.setShipsOnHex(newShipsOnHex);
 
 	}
-
 
 	/**
 	 * La fonction CheckNeighboursHex vérifie si le hex de destination choisi est bien voisin au hex de départ
@@ -196,15 +205,14 @@ public class Helper {
 		return systemNeighbours;
 	}
 
-	public static boolean HexAlreadyChoosed(Hex hexToInvadeFrom, ArrayList<Hex> hexsToInvadeFrom) {
-		boolean answer=hexsToInvadeFrom.contains(hexToInvadeFrom);
-		if(answer) {
-			return true;
-		}else {
-			return false;
-		}
-	}
-
+	/**
+	 * Trouve les hexs voisins d'un système contrôlés par un joueur spécifique.
+	 *
+	 * @param systemToInvade Le système de référence.
+	 * @param player Le joueur concerné.
+	 * @param board Le plateau de jeu.
+	 * @return Une liste des hexagones voisins contrôlés par le joueur.
+	 */
 	public static ArrayList<Hex> findNeighboursOwnedByPlayer(Hex systemToInvade, Player player, Board board) {
 		ArrayList<Hex> neighboursOwnedByPlayer = new ArrayList<>();
 
@@ -220,6 +228,13 @@ public class Helper {
 		return neighboursOwnedByPlayer;
 	}
 
+	/**
+	 * Vérifie si un joueur contrôle une carte de secteur donnée.
+	 *
+	 * @param chosenCard La carte de secteur à vérifier.
+	 * @param player Le joueur concerné.
+	 * @return true si le joueur contrôle la carte, false sinon.
+	 */
 	public static boolean TestOccupationPlayerCard(SectorCard chosenCard, Player player) {
 		for(Hex hexActuel: chosenCard.getHexes()){
 			if (hexActuel.getControlledBy() == player) {
@@ -227,5 +242,24 @@ public class Helper {
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Permet de dterminer le nombre total de vaisseaux sur le tTri Prime (puisqu'il est compose de plusieurs hexs)
+	 * @return Nombre de vaisseaux sur les hexs composants le Tri Prime
+	 */
+	public static int nbShipsOnTriPrime(){
+		Hex hex1=Board.gameBoard.get(3).get(2);
+		Hex hex2=Board.gameBoard.get(4).get(2);
+		Hex hex3=Board.gameBoard.get(4).get(3);
+		Hex hex4=Board.gameBoard.get(5).get(2);
+		int nbShips=0;
+
+		nbShips+=hex1.getShipsOnHex().size();
+		nbShips+=hex2.getShipsOnHex().size();
+		nbShips+=hex3.getShipsOnHex().size();
+		nbShips+=hex4.getShipsOnHex().size();
+
+		return nbShips;
 	}
 }

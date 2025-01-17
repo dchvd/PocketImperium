@@ -4,6 +4,9 @@ import java.util.ArrayList;
 
 /**
  * La classe Exterminate sers d'aide pour performer la commande Exterminate
+ * 
+ * @author Anaelle Melo, Daria Avdeeva
+ * @version 1.0
  */
 
 public class Exterminate{

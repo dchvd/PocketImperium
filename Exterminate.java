@@ -2,11 +2,31 @@ package pocket_imperium;
 
 import java.util.ArrayList;
 
+/**
+ * La classe Exterminate sers d'aide pour performer la commande Exterminate
+ */
+
 public class Exterminate{
+	// Attributs
+
+	/**
+	 * Système que le joueur souhaite envahir.
+	 */
 	private Hex systemToInvade;
+	/**
+	 * Système à partir duquel le joueur mène son attaque.
+	 */
 	private Hex systemToInvadeFrom;
+	/**
+	 * Nombre de vaisseaux utilisés par l'attaquant.
+	 */
 	private int nbShipsAttacker;
+	/**
+	 * Nombre de vaisseaux utilisés par le défenseur.
+	 */
 	private int nbShipsDefendant;
+
+	//Constructeur
 
 	/**
 	 * Le constructeur Exterminate permet de vérifier que tous les choix faits par les joueurs sont corrects avant de lancer l'action
@@ -139,9 +159,6 @@ public class Exterminate{
 				}
 				systemToInvade.getShipsOnHex().clear();
 			}
-//			for (int i =0; i < nbShipsAttacker; i++) {
-//				systemToInvadeFrom.getShipsOnHex().getFirst().destroyShip();
-//			}
 
 			//ajout du système à la liste des hexs controllés par l'attaquant
 			attacker.getControlledHexs().add(systemToInvade);
@@ -162,8 +179,6 @@ public class Exterminate{
 				for (int i = 0; i < shipsToRemove; i++) {
 					systemToInvade.getShipsOnHex().getFirst().destroyShip();
 					systemToInvade.getShipsOnHex().removeFirst();
-//					systemToInvadeFrom.getShipsOnHex().getFirst().destroyShip();
-//					systemToInvadeFrom.getShipsOnHex().removeFirst();
 				}
 			}
 

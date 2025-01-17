@@ -6,17 +6,56 @@ import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 
+/**
+ * Représente un joueur dans le jeu Pocket Imperium.
+ * La classe Player gère les informations d'un joueur, ses actions possibles,
+ * et l'interaction avec les éléments du jeu tels que les vaisseaux et les hexagones contrôlés.
+ * Cette classe peut représenter un joueur humain ou virtuel.
+ * Implemente Serializable pour permettre la sérialisation des objets Player.
+ */
 public class Player implements Serializable {
+
+	//Attributs
 	private static final long serialVersionUID = 1L;
+	/**
+	 * Nom du joueur
+	 */
 	private String name;
+	/**
+	 * Stratégie choisie pour le joueur virtuel uniquement
+	 */
 	private GameStrategy strategy;
+	/**
+	 * Couleur utilisée par le joeur
+	 */
 	private Color couleur;
+	/**
+	 * Liste des vaisseaux appartenant au joueur
+	 */
 	private ArrayList<Ship> ships=new ArrayList<Ship>();
+	/**
+	 * Liste des commandes planifiées par le joueur
+	 */
 	private ArrayList<Integer> commands=new ArrayList<Integer>();
+	/**
+	 * Indique si le joueur est virtuel
+	 */
 	private boolean isVirtual;
+	/**
+	 * Indique si le joueur controle le TriPrime
+	 */
 	private boolean controllsTriPrime;
+	/**
+	 * Liste des Hexs controlles par le joueur
+	 */
 	private ArrayList<Hex> controlledHexs=new ArrayList<Hex>();
+	/**
+	 * id du joueur
+	 */
 	private int id;
+	/**
+	 * Hex initial que le joueur souhaite envahir
+	 */
 	private Hex firstSystemToInvade;
 
 	public int getId() {
@@ -31,6 +70,14 @@ public class Player implements Serializable {
 		this.controlledHexs = controlledHexs;
 	}
 
+	//Constructeur
+	/**
+	 * Initialise un nouvel objet Player avec les paramètres spécifiés.
+	 *
+	 * @param sc Scanner pour la saisie utilisateur.
+	 * @param id Identifiant unique du joueur.
+	 * @param availableColors Liste des couleurs disponibles pour les joueurs.
+	 */
 	public Player(Scanner sc, int id, List<Color> availableColors) {
 		this.id = id;
 		while (true) {
@@ -107,6 +154,14 @@ public class Player implements Serializable {
 		}
 	}
 
+	//Methodes
+
+	/**
+	 * Permet au joueur de choisir le secteur en fin de partie sur lequel il souhaite gagner des points
+	 * @param plat Plateau utilise
+	 * @param sc Scanner pour la saisie utilisateur.
+	 * @return Secteur choisi
+	 */
 	public SectorCard chooseSector(Board plat, Scanner sc) {
 		System.out.println(this.name + ": choisissez sur quel vous souhaitez gagner des points ");
 		if (!this.isVirtual) {
@@ -164,7 +219,8 @@ public class Player implements Serializable {
 
 
 	/**
-	 * La methode plan permet au joueur de planifier l'ordre dans lequel il souhaire executer les commandes.
+	 * Permet au joueur de planifier l'ordre des commandes.
+	 * Les commandes peuvent être de type Expand, Explore ou Exterminate.
 	 */
 	public void plan() {
 		this.commands.clear();
@@ -297,8 +353,9 @@ public class Player implements Serializable {
 	}
 
 	/**
-	 * La fonction Expand permet au joueur d'ajouter au moins un de ses vaisseaux sur au moins un hex qu'il contrôle.
-	 * @param effectiveness détermine le nombre de vaisseaux que le joueur peut ajouter. Elle est définie en fonction du nombre de joueurs ayant choisi la même commande
+	 * Ajoute des vaisseaux sur les hexagones contrôlés par le joueur.
+	 *
+	 * @param effectiveness Nombre de vaisseaux que le joueur peut ajouter, definie en fonction du nombre de joueur qui performent aussi cette commande.
 	 */
 	public void Expand(int effectiveness) {
 		Scanner scanner=new Scanner(System.in);
@@ -395,6 +452,11 @@ public class Player implements Serializable {
 	 * @param effectivness determine le nombre de flottes que le joueur peut bouger. Elle est definie en fonction du nombre de joueurs ayant choisi la meme commande
 	 */
 
+	/**
+	 * Permet au joueur de déplacer ses vaisseaux entre des hexagones voisins.
+	 *
+	 * @param effectivness Nombre de flottes que le joueur peut déplacer. Elle est definie en fonction du nombre de joueurs ayant choisi la meme commande
+	 */
 	public void Explore(int effectivness) {
 		ArrayList<Integer> shipsIds=new ArrayList<Integer>();
 		int nbMovement=0;
@@ -602,6 +664,12 @@ public class Player implements Serializable {
 
 	}
 
+	/**
+	 * Permet au joueur d'attaquer un hexagone contrôlé par un autre joueur.
+	 *
+	 * @param effectivness Détermine le nombre de systèmes pouvant être attaqués. Elle est definie en fonction du nombre de joueurs ayant choisi la meme commande
+	 * @param board Plateau de jeu contenant les hexagones.
+	 */
 	public void Exterminate(int effectivness, Board board) {
 		ArrayList<Hex> systemsToInvadeFrom= new ArrayList<Hex>(); //Liste des hexs que le joueur souhaite utiliser pour envahir
 		int nbShipsAttacker=0; //nb de vaisseaux du joueur qui attaque
@@ -934,6 +1002,10 @@ public class Player implements Serializable {
 
 	}
 
+	/**
+	 * Permet de recuperer le premier vaisseau non place sur le plateau
+	 * @return le vaisseau a placer, sinon null s'il n'en reste plus
+	 */
 	private Ship getFirstShipNotPlaced() {
 		for (int i=0; i<this.ships.size(); i++){
 			if(!this.ships.get(i).isPlaced()){
@@ -945,17 +1017,23 @@ public class Player implements Serializable {
 		return null;
 	}
 
+	/**
+	 * Vérifie si le joueur est éliminé du jeu.
+	 *
+	 * @return true si le joueur n'a plus de vaisseaux, false sinon.
+	 */
 	public boolean isEliminated() {
 		return ships.isEmpty();
 	}
 
-
+	/**
+	 * Renvoie une description textuelle de l'état actuel du joueur.
+	 *
+	 * @return Chaîne de caractères décrivant le joueur.
+	 */
 	public String toString() {
 		return "État actuel de " + this.name + ":\n"
 				+ "- Hexs contrôlés: " + this.controlledHexs + "\n"
 				+ "- Contrôle le Tri Prime: " + this.controllsTriPrime + "\n";
 	}
-
-
-	//public boolean isWinner() {
 }
